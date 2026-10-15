@@ -178,20 +178,32 @@ tbody tr:hover td{background:color-mix(in srgb,var(--brand) 8%,var(--card))}
 .sw .t{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);width:100%;font-size:16px}
 #num{direction:ltr;text-align:center;font-size:20px;letter-spacing:1px}
 
-/* ===== v4 ===== */
+/* ===== v4 · ES1 modern ===== */
 .sw{max-width:560px}
-.hero{text-align:center;padding:26px 10px 4px}.hero .lg{display:inline-grid;animation:fl2 4s ease-in-out infinite}
+.hero{text-align:center;padding:26px 10px 6px}.hero .lg{display:inline-grid;animation:fl2 4s ease-in-out infinite}
+.hero h1{margin:8px 0 2px;font-size:24px;font-weight:800;background:linear-gradient(90deg,#00b8d9,#6c47ff,#ec2f8c);-webkit-background-clip:text;background-clip:text;color:transparent}
 @keyframes fl2{50%{transform:translateY(-6px) rotate(-6deg)}}
-.tl3{display:flex;flex-direction:column;gap:14px;margin:4px 0}
-.big3{position:relative;border:0;border-radius:24px;padding:20px 18px;color:#fff;text-align:right;cursor:pointer;display:grid;grid-template-columns:auto 1fr;gap:2px 14px;align-items:center;width:100%;
- background:linear-gradient(120deg,var(--a),var(--b),var(--a));background-size:200% 100%;animation:hg 8s ease infinite,up .6s both;animation-delay:0s,calc(var(--i,0)*120ms);
- box-shadow:0 14px 30px color-mix(in srgb,var(--a) 40%,transparent);transition:transform .25s cubic-bezier(.34,1.56,.64,1);overflow:hidden}
-.big3:hover{transform:translateY(-4px) scale(1.02)}.big3:active{transform:scale(.97)}
-.big3 .ic{grid-row:1/3;font-size:44px;animation:fl2 3.4s ease-in-out infinite;filter:drop-shadow(0 4px 6px #0004)}
-.big3 b{font-size:18px;font-weight:800;align-self:end}.big3 small{opacity:.92;align-self:start}
-.big3 em{position:absolute;top:10px;left:12px;background:#fff;color:#14122b;border-radius:99px;padding:1px 10px;font-style:normal;font-weight:800;font-size:12px}
+.tl3{display:flex;flex-direction:column;gap:12px;margin:4px 0}
+.big3{position:relative;display:grid;grid-template-columns:auto 1fr;gap:2px 14px;align-items:center;width:100%;text-align:right;text-decoration:none;color:inherit;cursor:pointer;background:var(--card);border:1px solid var(--line);border-top:4px solid var(--a);border-radius:20px;padding:14px 16px;transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s;animation:up .5s both;animation-delay:calc(var(--i,0)*90ms)}
+.big3:hover{transform:translateY(-4px);box-shadow:0 14px 34px color-mix(in srgb,var(--a) 28%,transparent)}.big3:active{transform:scale(.98)}
+.big3 .ic{grid-row:1/3;width:54px;height:54px;border-radius:16px;display:grid;place-items:center;font-size:27px;color:#fff;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 8px 18px color-mix(in srgb,var(--a) 40%,transparent)}
+.big3 b{font-size:16px;font-weight:800;align-self:end}.big3 small{color:var(--mute);align-self:start}
+.big3 em{position:absolute;top:10px;left:12px;background:linear-gradient(120deg,var(--a),var(--b));color:#fff;border-radius:99px;padding:1px 10px;font-style:normal;font-weight:800;font-size:12px}
+.tlink{display:block;text-align:center;color:var(--mute);text-decoration:none;padding:8px}.tlink:hover{color:var(--brand)}
 .pbox iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:12px;background:#000;margin-top:6px}.pbox img{width:100%;border-radius:12px;margin-top:6px}
 .sr .btn{display:block}
+.upl{border:2px dashed color-mix(in srgb,var(--brand) 45%,var(--line));background:color-mix(in srgb,var(--brand) 6%,var(--card));padding:16px;font-weight:700;border-radius:14px}
+.upl:hover{background:color-mix(in srgb,var(--brand) 12%,var(--card))}
+#upl{position:fixed;bottom:16px;left:0;right:0;margin-inline:auto;width:min(94vw,430px);z-index:90;display:flex;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-top:4px solid var(--brand);border-radius:20px;padding:14px 16px;box-shadow:0 20px 50px #0005;animation:up .35s both}
+#upl.ok{border-top-color:var(--ok)}#upl.er{border-top-color:var(--danger)}
+.upr{flex:none;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--brand) calc(var(--p)*1%),var(--line) 0)}
+.upr b{width:48px;height:48px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:13px}
+#upl.ok .upr{background:var(--ok)}#upl.er .upr{background:var(--danger)}#upl.ok .upr b,#upl.er .upr b{background:none;color:#fff;font-size:24px}
+#upl.busy .upr{animation:pls 1.4s ease-in-out infinite}
+@keyframes pls{50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--brand) 22%,transparent)}}
+.upt{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}.upt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.upt small{color:var(--mute)}
+.mobsel{display:none}
+@media (max-width:760px){.mobsel{display:block;width:100%;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--card);margin-bottom:12px;font-weight:700}header{gap:8px;padding:10px 12px}.tabs{order:9;width:100%}.tab{flex:1}.logo h1{font-size:16px}#live{display:none}}
 </style>
 </head>
 <body>
@@ -212,6 +224,7 @@ tbody tr:hover td{background:color-mix(in srgb,var(--brand) 8%,var(--card))}
   <button class="btn" id="bRes" title="بازیابی">♻️</button>
   <button class="btn" id="bMat" title="مطالب تدریس‌شده">📚</button>
   <button class="btn" id="bSet" title="تنظیمات و اتصال">⚙️</button>
+  <button class="btn" id="bOut" title="خروج">🚪</button>
   <input type="file" id="fRes" accept=".json" hidden>
 </header>
 <main>
@@ -231,7 +244,6 @@ const API='';/* ← آدرس Web app اپس‌اسکریپت را اینجا ب�
 const LV={1:['شروع خوب','🌱'],2:['خوب','🙂'],3:['بسیار خوب','😍'],4:['عالی','🔥'],5:['بی‌نظیر','🏆']};
 function burst(el){const r=el.getBoundingClientRect();for(let i=0;i<14;i++){const p=document.createElement('i'),a=Math.random()*6.28,d=30+Math.random()*50;p.className='pt';p.style.cssText=`left:${r.left+r.width/2}px;top:${r.top+r.height/2}px;background:${['#00b8d9','#ff2e88','#ffc928','#6c47ff'][i%4]};--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px`;document.body.appendChild(p);setTimeout(()=>p.remove(),700);}}
 const SEED=[{"num":"40411503101","name":"ادهم حدیث"},{"num":"40411503102","name":"اصغرنژاد عسل"},{"num":"40411503103","name":"افتخاری کرده ده روژینا"},{"num":"40411503104","name":"امیران بستان اباد زهرا"},{"num":"40411503105","name":"ایمانی اشنار سما"},{"num":"40411503106","name":"بایرامی حسنا"},{"num":"40411503108","name":"حسین پورمعتمد ساینا"},{"num":"40411503109","name":"رجبی لاسکی ستایش"},{"num":"40411503110","name":"عباسی جومیلو بیتا"},{"num":"40511503221","name":"عبداللهی مهدی"},{"num":"40411503111","name":"علی زاده مانیا"},{"num":"40411503112","name":"غفاری یایچی ایدا"},{"num":"40411503113","name":"معانی فاطمه"},{"num":"40411503114","name":"ملکی هلیا"},{"num":"40411503115","name":"منوری اسما"},{"num":"40411503117","name":"مهرپرور سیده معصومه"},{"num":"40411503118","name":"نیک منش مهدیه"},{"num":"40411503119","name":"هاتف هریس اسما"},{"num":"40411503120","name":"هریک دیزجی دینا"}];
-const SCRIPT="const TEACHER_KEY='CHANGE-ME-1234';\nconst SEED=[{\"num\":\"40411503101\",\"name\":\"ادهم حدیث\"},{\"num\":\"40411503102\",\"name\":\"اصغرنژاد عسل\"},{\"num\":\"40411503103\",\"name\":\"افتخاری کرده ده روژینا\"},{\"num\":\"40411503104\",\"name\":\"امیران بستان اباد زهرا\"},{\"num\":\"40411503105\",\"name\":\"ایمانی اشنار سما\"},{\"num\":\"40411503106\",\"name\":\"بایرامی حسنا\"},{\"num\":\"40411503108\",\"name\":\"حسین پورمعتمد ساینا\"},{\"num\":\"40411503109\",\"name\":\"رجبی لاسکی ستایش\"},{\"num\":\"40411503110\",\"name\":\"عباسی جومیلو بیتا\"},{\"num\":\"40511503221\",\"name\":\"عبداللهی مهدی\"},{\"num\":\"40411503111\",\"name\":\"علی زاده مانیا\"},{\"num\":\"40411503112\",\"name\":\"غفاری یایچی ایدا\"},{\"num\":\"40411503113\",\"name\":\"معانی فاطمه\"},{\"num\":\"40411503114\",\"name\":\"ملکی هلیا\"},{\"num\":\"40411503115\",\"name\":\"منوری اسما\"},{\"num\":\"40411503117\",\"name\":\"مهرپرور سیده معصومه\"},{\"num\":\"40411503118\",\"name\":\"نیک منش مهدیه\"},{\"num\":\"40411503119\",\"name\":\"هاتف هریس اسما\"},{\"num\":\"40411503120\",\"name\":\"هریک دیزجی دینا\"}];\nconst N=12;\nfunction sh_(n){const s=SpreadsheetApp.getActiveSpreadsheet();return s.getSheetByName(n)||s.insertSheet(n)}\nfunction rows_(n){const x=sh_(n);return x.getLastRow()?x.getDataRange().getValues():[]}\nfunction out_(o){return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON)}\nfunction roster_(){if(!rows_('roster').length){const x=sh_('roster');SEED.forEach(s=>x.appendRow([String(s.num),s.name]))}return rows_('roster').map(x=>({num:String(x[0]),name:String(x[1])}))}\nfunction files_(){return rows_('files').map(x=>({num:String(x[0]),s:+x[1],kind:x[2],id:x[3],name:x[4],mime:x[5],t:+x[6]}))}\nfunction ideas_(){return rows_('ideas').map(x=>({num:String(x[0]),s:+x[1],text:String(x[2]),t:+x[3]}))}\nfunction votes_(){return rows_('votes').map(x=>({rater:String(x[0]),s:+x[1],target:String(x[2]),score:+x[3],t:+x[4]}))}\nfunction done_(){const m={};rows_('done').forEach(x=>{m[x[0]+'|'+x[1]]=[String(x[0]),+x[1],+x[2]]});return Object.keys(m).map(k=>m[k])}\nfunction folder_(num,s){const it=DriveApp.getFoldersByName('ClassTracker');const root=it.hasNext()?it.next():DriveApp.createFolder('ClassTracker');\n  const sub=(p,n)=>{const i=p.getFoldersByName(n);return i.hasNext()?i.next():p.createFolder(n)};return sub(sub(root,String(num)),'session-'+s)}\nfunction upsert_(n,kl,row){const x=sh_(n),v=rows_(n);for(let i=0;i<v.length;i++){let ok=true;for(let j=0;j<kl;j++)if(String(v[i][j])!==String(row[j]))ok=false;\n  if(ok){x.getRange(i+1,1,1,row.length).setValues([row]);return}}x.appendRow(row)}\nfunction doGet(){return out_({ok:1})}\nfunction doPost(e){try{\n  const d=JSON.parse(e.postData.contents),a=d.a;\n  if(['all','done','roster'].indexOf(a)>=0){\n    if(d.key!==TEACHER_KEY)return out_({err:'کلید معلم نادرست است'});\n    if(a==='all')return out_({roster:roster_(),files:files_(),ideas:ideas_(),votes:votes_(),done:done_()});\n    if(a==='done'){upsert_('done',2,[String(d.num),+d.s,d.done?1:0]);return out_({ok:1})}\n    if(d.list&&d.list.length){const x=sh_('roster');x.clear();d.list.forEach(s=>x.appendRow([String(s.num),s.name]))}\n    return out_({ok:1})}\n  const T=d.key===TEACHER_KEY&&d.num==='teacher',ro=roster_(),me=T?{num:'teacher',name:'استاد'}:ro.filter(r=>r.num===String(d.num))[0];\n  if(!me)return out_({err:'این شماره دانشجویی در فهرست کلاس نیست'});\n  const s=+d.s;\n  if(a==='student')return out_({me:me,roster:ro,files:files_().filter(f=>f.num===me.num||f.kind==='media'||f.kind==='material'),ideas:ideas_().filter(i=>i.num===me.num),notes:ideas_().filter(i=>i.num==='teacher'),\n    done:done_().filter(x=>x[0]===me.num&&x[2]).map(x=>x[1]),votes:votes_().filter(v=>v.rater===me.num)});\n  if(a==='del'){const sh=sh_('files'),v=rows_('files');for(let i=0;i<v.length;i++)if(v[i][3]===d.id&&String(v[i][0])===me.num){sh.deleteRow(i+1);try{DriveApp.getFileById(d.id).setTrashed(true)}catch(x){}return out_({ok:1})}return out_({err:'فایل پیدا نشد'})}\n  if(!(s>=1&&s<=N))return out_({err:'جلسه نامعتبر'});\n  if(a==='idea'){upsert_('ideas',2,[me.num,s,String(d.text||'').slice(0,40000),Date.now()]);return out_({ok:1})}\n  if(a==='vote'){const fl=files_();let n=0;(d.votes||[]).forEach(v=>{const t=String(v.target),sc=+v.score;\n    if(t!==me.num&&sc>=1&&sc<=5&&fl.some(f=>f.num===t&&f.s===s&&f.kind==='media')){sh_('votes').appendRow([me.num,s,t,sc,Date.now()]);n++}});return out_({ok:n})}\n  if(a==='init'){if(!(d.size>0&&d.size<=209715200))return out_({err:'حجم فایل نامعتبر (حداکثر ۲۰۰ مگابایت)'});\n    const f=folder_(me.num,s);\n    const r=UrlFetchApp.fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable',{method:'post',contentType:'application/json; charset=UTF-8',\n      headers:{Authorization:'Bearer '+ScriptApp.getOAuthToken(),'X-Upload-Content-Type':d.mime},payload:JSON.stringify({name:d.name,parents:[f.getId()]}),muteHttpExceptions:true});\n    const h=r.getAllHeaders(),uri=h.Location||h.location;\n    return uri?out_({uri:uri}):out_({err:'ساخت آپلود ناموفق: '+r.getContentText().slice(0,150)})}\n  if(a==='chunk'){if(String(d.uri).indexOf('https://www.googleapis.com/upload/drive/')!==0)return out_({err:'آدرس نامعتبر'});\n    const b=Utilities.base64Decode(d.data),end=d.start+b.length-1;\n    const r=UrlFetchApp.fetch(d.uri,{method:'put',contentType:'application/octet-stream',headers:{'Content-Range':'bytes '+d.start+'-'+end+'/'+d.total},payload:b,muteHttpExceptions:true});\n    const c=r.getResponseCode();if(c===308)return out_({ok:1});\n    if(c===200||c===201){const id=JSON.parse(r.getContentText()).id;DriveApp.getFileById(id).setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);\n      sh_('files').appendRow([me.num,s,d.kind==='idea'?'idea':d.kind==='material'?'material':'media',id,d.name,d.mime,Date.now()]);return out_({done:1,id:id})}\n    return out_({err:'خطای آپلود '+c})}\n  return out_({err:'درخواست نامعتبر'})\n}catch(x){return out_({err:String(x)})}}";
 const LOGO='<svg viewBox="0 0 40 40" width="36" height="36"><g style="mix-blend-mode:screen"><circle cx="15" cy="15" r="10" fill="#00b8d9"/><circle cx="25" cy="15" r="10" fill="#ff2e88"/><circle cx="20" cy="24" r="10" fill="#ffc928"/></g></svg>';
 const Q=new URLSearchParams(location.search),STU=Q.has('s');
 const cfg={get:(k,d)=>{try{return localStorage.getItem('ct_'+k)??d}catch(e){return d}},set:(k,v)=>{try{localStorage.setItem('ct_'+k,v)}catch(e){}}};
@@ -245,7 +257,7 @@ const rateBtns=(on,dis)=>[1,2,3,4,5].map(v=>`<button class="lv${v} ${on===v?'on'
 const rateLbl=v=>v?`<span class="lv${v}"><b>${LV[v][1]} ${LV[v][0]}</b></span>`:'';
 
 const sname=s=>s===FINAL?'جلسه ۱۲ · ژوری و تحویل نهایی':'جلسه '+fa(s);
-const post=(u,d)=>fetch(u,{method:'POST',body:JSON.stringify(d)}).then(r=>r.json());
+const post=(u,d)=>fetch(u,{method:'POST',body:JSON.stringify(d)}).then(async r=>{const t=await r.text();try{return JSON.parse(t)}catch(e){throw new Error('پاسخ نامعتبر از سرور؛ نسخهٔ جدید Deploy نشده یا دسترسی Anyone نیست')}});
 const DR={th:(id,w)=>`https://drive.google.com/thumbnail?id=${id}&sz=w${w||600}`,pv:id=>`https://drive.google.com/file/d/${id}/preview`,view:id=>`https://drive.google.com/file/d/${id}/view`};
 const isImg=m=>/^image/.test(m.mime),isVid=m=>/^video/.test(m.mime);
 const mThumb=m=>isImg(m)||isVid(m)?`<img src="${DR.th(m.id)}" alt="" loading="lazy">`:`<div class="doc">📄</div>`;
@@ -259,11 +271,20 @@ const chart=(dn,sc)=>{const k=Object.values(dn).filter(Boolean).length,p=Math.ro
 /* ===== آپلود مشترک (دانشجو و استاد) ===== */
 const b64=b=>new Promise(ok=>{const r=new FileReader();r.onload=()=>ok(r.result.split(',')[1]);r.readAsDataURL(b)});
 const postR=async(u,d)=>{for(let t=0;;t++){try{return await post(u,d)}catch(e){if(t>1)throw e;await new Promise(r=>setTimeout(r,1500))}}};
-async function uploadFile(u,base,f,kind,ses){
+const mb=b=>fa(b/1048576)+' MB';
+const UP={e:null,n:1,i:0,nm:'',sz:1,t0:0,
+ box(){if(!this.e||!document.body.contains(this.e)){this.e=document.createElement('div');this.e.id='upl';document.body.appendChild(this.e)}return this.e},
+ draw(p,l1,l2,st){const e=this.box();e.className=st||'busy';e.style.setProperty('--p',p);e.innerHTML=`<div class="upr"><b>${st==='ok'?'✓':st==='er'?'!':fa(Math.round(p))+'٪'}</b></div><div class="upt"><b>${l1}</b><small>${l2}</small>${st?'':`<div class="pg"><i style="width:${p}%"></i></div>`}</div>`},
+ begin(n){this.n=n;window.onbeforeunload=()=>'آپلود در جریان است'},
+ file(nm,i,sz){this.nm=nm;this.i=i;this.sz=sz||1;this.t0=Date.now();this.draw(0,'⏳ '+esc(nm),`فایل ${fa(i+1)} از ${fa(this.n)} · در حال آماده‌سازی…`)},
+ prog(l){const p=l/this.sz*100,sp=l/Math.max(1,(Date.now()-this.t0)/1000);this.draw(p,'⬆️ '+esc(this.nm),`${mb(l)} از ${mb(this.sz)} · ${mb(sp)}/ث · فایل ${fa(this.i+1)} از ${fa(this.n)}`)},
+ end(ok,msg){window.onbeforeunload=null;this.draw(ok?100:0,msg,'',ok?'ok':'er');setTimeout(()=>{if(this.e){this.e.remove();this.e=null}},ok?2500:8000)}};
+async function uploadFile(u,base,f,kind,ses,i){
   if(f.size>209715200)throw new Error('حجم فایل بیشتر از ۲۰۰ مگابایت است');
+  UP.file(f.name,i||0,f.size);
   const mime=f.type||'application/octet-stream',r0=await postR(u,{...base,a:'init',s:ses,kind,name:f.name,mime,size:f.size});if(r0.err)throw new Error(r0.err);
   for(let o=0;o<f.size;){const e=Math.min(o+1572864,f.size),r=await postR(u,{...base,a:'chunk',s:ses,kind,name:f.name,mime,uri:r0.uri,start:o,total:f.size,data:await b64(f.slice(o,e))});
-    if(r.err)throw new Error(r.err);o=e;const pg=$('pg');if(pg){pg.hidden=false;pg.firstChild.style.width=(o/f.size*100)+'%';}}}
+    if(r.err)throw new Error(r.err);o=e;UP.prog(o);}}
 
 /* ================= حالت دانشجو ================= */
 function student(){
@@ -276,7 +297,7 @@ function student(){
     $('pm').onclick=e=>{if(e.target.id==='pm'){$('pm').classList.remove('on');$('pb').innerHTML='';}};
     $('app').onclick=click;$('app').onchange=change;$('pm').addEventListener('click',click);$('pm').addEventListener('change',change);};
   const login=msg=>{shell(`<div class="hero"><span class="lg">${LOGO.replace(/36/g,'72')}</span><h1 style="margin:8px 0 2px">کارگاه گرافیک و تبلیغات</h1><small class="lb">دانشگاه محقق اردبیل · ترم سه · استاد علی حسین عباس‌زاده</small></div>
-    <div class="sr"><b>🔐 ورود با شماره دانشجویی</b><input id="num" class="t" inputmode="numeric" autocomplete="off" placeholder="شماره دانشجویی" value="${esc(cfg.get('num',''))}"><button class="btn pri big" id="go">ورود به صفحه من ✨</button><div class="lb" style="color:var(--danger)">${msg||''}</div></div>`);
+    <div class="sr"><b>🔐 ورود با شماره دانشجویی</b><input id="num" class="t" inputmode="numeric" autocomplete="off" placeholder="شماره دانشجویی" value="${esc(cfg.get('num',''))}"><button class="btn pri big" id="go">ورود به صفحه من ✨</button><div class="lb" style="color:var(--danger)">${msg||''}</div></div><a class="tlink" href="?t=1">🎓 ورود استاد</a>`);
     const go=()=>enter($('num').value);$('go').onclick=go;$('num').onkeydown=e=>{if(e.key==='Enter')go()};};
   const loadSc=()=>{sc={};D.votes.forEach(v=>{if(v.s===rs){sc[v.target]=v.score;seen[v.target+'|'+rs]=1;}});};
   async function refresh(){const r=await post(u,{a:'student',num:D.num});if(!r.err){D={...r,num:D.num};loadSc();}}
@@ -354,9 +375,10 @@ function student(){
       try{const r=await post(u,{a:'vote',num:D.num,s:rs,votes});if(r.err)return toast(r.err);burst(t);toast('امتیازها ارسال شد 🎉 (ارسال دوباره = ویرایش)');await refresh();}catch(x){toast('ارسال نشد؛ اینترنت را بررسی کنید')}}
   }
   async function change(e){
-    if(e.target.id!=='fm'&&e.target.id!=='fi')return;const k=e.target.id==='fm'?'media':'idea',fs=[...e.target.files];
-    try{for(const f of fs){toast('در حال آپلود «'+f.name+'»… صبر کنید');await uploadFile(u,{num:D.num},f,k,cs);}toast('آپلود شد ✓');burst(document.body);await refresh();if($('fi'))ideaModal();view();}
-    catch(err){toast('خطا: '+err.message)}}
+    if(e.target.id!=='fm'&&e.target.id!=='fi')return;const k=e.target.id==='fm'?'media':'idea',fs=[...e.target.files];if(!fs.length)return;
+    UP.begin(fs.length);
+    try{for(let i=0;i<fs.length;i++)await uploadFile(u,{num:D.num},fs[i],k,cs,i);UP.end(true,'آپلود کامل شد 🎉');burst(document.body);await refresh();if($('fi'))ideaModal();view();}
+    catch(err){UP.end(false,'آپلود ناموفق: '+err.message)}}
   const n0=cfg.get('num','');n0?enter(n0):login();
 }
 
@@ -400,7 +422,7 @@ async function load(){
 const allM=()=>Object.values(mediaByKey).flat();
 function openM(id){const m=allM().find(x=>x.id===id);if(!m)return;
   $('pb').innerHTML=mFull(m)+`<div style="text-align:center;margin-top:8px;color:var(--mute)">${esc(m.name)} · <a href="${DR.view(m.id)}" target="_blank">باز کردن در Drive</a></div>`;$('pm').classList.add('on');}
-const pushRoster=()=>{const u=cfg.get('url',''),k=cfg.get('key','');if(u&&k)post(u,{a:'roster',key:k,list:students.map(s=>({num:s.num,name:s.name}))}).catch(()=>{});};
+const pushRoster=()=>{const u=(cfg.get('url','')||API),k=cfg.get('key','');if(u&&k)post(u,{a:'roster',key:k,list:students.map(s=>({num:s.num,name:s.name}))}).catch(()=>{});};
 
 function renderList(){
   const q=filter.trim();
@@ -426,7 +448,7 @@ function renderStudent(scrollTo){
   const s=students.find(x=>x.id===cur);
   if(!s){$('view').innerHTML='<div class="empty">یک دانشجو را از فهرست انتخاب کنید.</div>';return;}
   const st=stats(s.id),dn={},sc={};sessions().forEach(x=>{dn[x]=rec(s.id,x).done;sc[x]=score(s.id,x);});
-  $('view').innerHTML=`<div class="shead"><h2>${esc(s.name)}</h2><span class="num">${esc(s.num)}</span><span class="sp"></span>
+  $('view').innerHTML=`<select id="mobSel" class="mobsel">${students.map(x=>`<option value="${x.id}" ${x.id===cur?'selected':''}>${esc(x.name)}</option>`).join('')}</select><div class="shead"><h2>${esc(s.name)}</h2><span class="num">${esc(s.num)}</span><span class="sp"></span>
     <div class="kpi"><div><b>${fa(st.avg)}</b><small>میانگین</small></div><div><b>${fa(st.tot)}</b><small>مجموع</small></div><div><b>${fa(prog(s.id))}/${fa(N)}</b><small>تکمیل</small></div></div>
     <button class="btn" id="bEd">✏️ ویرایش</button><button class="btn dng" id="bDel">🗑 حذف</button></div>
     <div class="grid">${sessions().map(x=>card(s.id,x)).join('')}</div>
@@ -470,7 +492,7 @@ $('view').addEventListener('click',async e=>{
   if(c){cur=+c.dataset.id;setTab('stu');renderList();$('side').style.display='flex';renderStudent(+c.dataset.s);return;}
   const tl=e.target.closest('.tile');
   if(tl){if(tl.dataset.m)openM(tl.dataset.m);else{cur=+tl.dataset.id;setTab('stu');render();}return;}
-  if(e.target.id==='bLink'){const h=cfg.get('host',''),u=cfg.get('url','');if(!h||!u){toast('ابتدا آدرس اتصال و میزبانی را در ⚙️ وارد کنید');return settings();}return copy(h.split('?')[0]+'?s=1&c='+gs+'&u='+encodeURIComponent(u));}
+  if(e.target.id==='bLink'){const h=cfg.get('host',''),u=(cfg.get('url','')||API);if(!h||!u){toast('ابتدا آدرس اتصال و میزبانی را در ⚙️ وارد کنید');return settings();}return copy(h.split('?')[0]+'?s=1&c='+gs+'&u='+encodeURIComponent(u));}
   if(e.target.id==='bEd')return editStudent(cur);
   if(e.target.id==='bDel'){const s=students.find(x=>x.id===cur);
     if(!confirm('حذف «'+s.name+'» و همه اطلاعات و فایل‌هایش؟'))return;
@@ -484,10 +506,11 @@ $('view').addEventListener('click',async e=>{
     r.rating=r.rating===v?0:v;if(r.rating)burst(seg);await saveRec(r);renderStudent();renderList();}
 });
 $('view').addEventListener('change',async e=>{
+  if(e.target.id==='mobSel'){cur=+e.target.value;return render();}
   if(e.target.id==='gs'){gs=+e.target.value;return renderGallery();}
   const cd=e.target.closest('.card');if(!cd)return;const s=+cd.dataset.s;
   if(e.target.classList.contains('dn')){const r=rec(cur,s);r.done=e.target.checked;await saveRec(r);
-    const st=students.find(x=>x.id===cur),u=cfg.get('url','');
+    const st=students.find(x=>x.id===cur),u=(cfg.get('url','')||API);
     if(u)post(u,{a:'done',key:cfg.get('key',''),num:st.num,s,done:r.done}).then(x=>{if(x.err)toast(x.err)}).catch(()=>toast('ثبت روی سرور ناموفق بود'));
     renderStudent();renderList();}
   if(e.target.classList.contains('note')){const r=rec(cur,s);r.note=e.target.value;await saveRec(r);}
@@ -512,10 +535,10 @@ $('bAdd').onclick=()=>editStudent(null);
 
 /* ---- sync & settings ---- */
 async function sync(q){
-  const u=cfg.get('url','');if(!u){if(q)return;toast('ابتدا آدرس اتصال را در ⚙️ تنظیمات وارد کنید');return settings();}
+  const u=(cfg.get('url','')||API);if(!u){if(q)return;toast('ابتدا آدرس اتصال را در ⚙️ تنظیمات وارد کنید');return settings();}
   if(!q)toast('در حال دریافت اطلاعات…');
   if(!sync.r){sync.r=1;pushRoster();}
-  try{const a=await post(u,{a:'all',key:cfg.get('key','')});if(a.err){if(!q)toast(a.err);return;}
+  try{const a=await post(u,{a:'all',key:cfg.get('key','')});if(a.err){if(/کلید/.test(a.err)){cfg.set('key','');location.replace(location.pathname+'?t=1');return}if(!q)toast(a.err);return;}
     srv={files:a.files||[],ideas:a.ideas||[],done:a.done||[]};
     const best={};(a.votes||[]).forEach(v=>{if(v.rater===v.target||!(v.score>=1&&v.score<=5))return;const k=v.rater+'|'+v.s+'|'+v.target;if(!best[k]||v.t>=best[k].t)best[k]={...v,k};});
     await putMany('votes',Object.values(best));
@@ -528,10 +551,8 @@ async function sync(q){
 }
 function settings(){
   $('ff').innerHTML=`<h3 style="margin:0">⚙️ اتصال و تنظیمات</h3>
-    <small><b>راه‌اندازی:</b> کد زیر را در Google Sheet ← Extensions ← Apps Script بچسبانید، مقدار <b>TEACHER_KEY</b> را به یک رمز دلخواه تغییر دهید، Deploy کنید (Web app، Execute as: Me، Access: Anyone) و آدرس آن را اینجا بگذارید. «کلید معلم» پایین باید دقیقاً همان رمز باشد. فایل‌ها در پوشهٔ <b>ClassTracker</b> در Google Drive شما ذخیره می‌شوند.</small>
-    <textarea id="sc" readonly rows="6" style="direction:ltr;font-size:11px">${esc(SCRIPT)}</textarea>
-    <div class="row"><button class="btn" id="cs">کپی کد Apps Script</button></div>
-    <input id="su" placeholder="آدرس Web app (https://script.google.com/macros/s/…/exec)" style="direction:ltr" value="${esc(cfg.get('url',''))}">
+    <small><b>راه‌اندازی:</b> کد فایل <b>Code.gs</b> را در Apps Script بگذارید و Deploy کنید؛ سپس آدرس Web app و «کلید معلم» (همان TEACHER_KEY) را اینجا وارد کنید. فایل‌ها در پوشهٔ <b>ClassTracker</b> در Google Drive ذخیره می‌شوند.</small>
+    <input id="su" placeholder="آدرس Web app (https://script.google.com/macros/s/…/exec)" style="direction:ltr" value="${esc((cfg.get('url','')||API))}">
     <input id="sk" placeholder="کلید معلم (TEACHER_KEY)" style="direction:ltr" value="${esc(cfg.get('key',''))}">
     <label>وزن رأی همکلاسی‌ها در امتیاز نهایی: <b id="wv">${fa(W()*100)}</b>٪ (بقیه = امتیاز استاد)<input type="range" id="sw" min="0" max="100" step="10" value="${W()*100}"></label>
     <input id="sh" placeholder="آدرس میزبانی همین فایل (مثلاً https://you.github.io/repo/)" style="direction:ltr" value="${esc(cfg.get('host',''))}">
@@ -539,13 +560,13 @@ function settings(){
   $('fmod').classList.add('on');
   const save=()=>{cfg.set('url',$('su').value.trim());cfg.set('key',$('sk').value.trim());cfg.set('w',$('sw').value);cfg.set('host',$('sh').value.trim());};
   $('sw').oninput=()=>$('wv').textContent=fa($('sw').value);
-  $('cs').onclick=()=>copy(SCRIPT);
+  
   $('fc').onclick=()=>$('fmod').classList.remove('on');
   $('ss').onclick=()=>{save();$('fmod').classList.remove('on');sync.r=0;render();sync();toast('ذخیره شد ✓');};
-  $('cl').onclick=()=>{save();const h=cfg.get('host','');if(!h||!cfg.get('url',''))return toast('آدرس اتصال و آدرس میزبانی را وارد کنید');copy(h.split('?')[0]+'?s=1&u='+encodeURIComponent(cfg.get('url','')));};
+  $('cl').onclick=()=>{save();const h=cfg.get('host','');if(!h||!(cfg.get('url','')||API))return toast('آدرس اتصال و آدرس میزبانی را وارد کنید');copy(h.split('?')[0]+'?s=1&u='+encodeURIComponent((cfg.get('url','')||API)));};
 }
 function materials(){
-  const u=cfg.get('url',''),k=cfg.get('key','');if(!u||!k){toast('ابتدا ⚙️ را تنظیم کنید');return settings();}
+  const u=(cfg.get('url','')||API),k=cfg.get('key','');if(!u||!k){toast('ابتدا ⚙️ را تنظیم کنید');return settings();}
   let s=gs;
   const draw=()=>{const L=srv.files.filter(f=>f.kind==='material'&&f.s===s),t=srv.ideas.find(i=>i.num==='teacher'&&i.s===s);
     $('ff').innerHTML=`<h3 style="margin:0">📚 مطالب تدریس‌شده</h3><select id="ms">${sessions().map(x=>`<option value="${x}" ${x===s?'selected':''}>${sname(x)}</option>`).join('')}</select>
@@ -556,7 +577,7 @@ function materials(){
     $('fc').onclick=()=>$('fmod').classList.remove('on');
     $('ms').onchange=e=>{s=+e.target.value;draw();};
     $('mts').onclick=async()=>{const r=await post(u,{a:'idea',key:k,num:'teacher',s,text:$('mt').value});toast(r.err||'ذخیره شد ✓');await sync(true);draw();};
-    $('mf').onchange=async e=>{try{for(const f of e.target.files){toast('در حال آپلود «'+f.name+'»…');await uploadFile(u,{num:'teacher',key:k},f,'material',s);}toast('آپلود شد ✓');}catch(x){toast('خطا: '+x.message)}await sync(true);draw();};
+    $('mf').onchange=async e=>{const fs=[...e.target.files];UP.begin(fs.length);try{for(let i=0;i<fs.length;i++)await uploadFile(u,{num:'teacher',key:k},fs[i],'material',s,i);UP.end(true,'آپلود کامل شد 🎉')}catch(x){UP.end(false,'آپلود ناموفق: '+x.message)}await sync(true);draw();};
     $('ff').querySelectorAll('[data-x]').forEach(b=>b.onclick=async()=>{if(!confirm('حذف شود؟'))return;await post(u,{a:'del',key:k,num:'teacher',id:b.dataset.x});await sync(true);draw();});};
   $('fmod').classList.add('on');draw();
 }
@@ -568,7 +589,7 @@ function guide(){$('ff').innerHTML=`<h3 style="margin:0">❓ روند کار</h3
 <li>جلسهٔ ۱۲ = ژوری و تحویل نهایی. امتیاز جلسه = امتیاز شما و میانگین همکلاسی‌ها با وزن ⚙️.</li></ol>
 <div class="row"><button class="btn pri" id="fc">فهمیدم</button></div>`;$('fmod').classList.add('on');$('fc').onclick=()=>$('fmod').classList.remove('on');}
 $('bMat').onclick=materials;
-$('bSet').onclick=settings;$('bHelp').onclick=guide;$('bSync').onclick=sync;
+$('bSet').onclick=settings;$('bOut').onclick=()=>{cfg.set('key','');location.href=location.pathname;};$('bHelp').onclick=guide;$('bSync').onclick=sync;
 
 /* ---- export / backup ---- */
 const dl=(name,blob)=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();};
@@ -608,7 +629,24 @@ $('fRes').onchange=async e=>{const f=e.target.files[0];if(!f)return;
   await load();cur=students[0]?.id;render();sync(true);setInterval(()=>{if(!document.hidden)sync(true)},45000);
 })();
 }
-(Q.has('t')?teacher:student)();
+function landing(){document.body.className='stu';
+  document.body.innerHTML=`<div class="sw"><div class="hero"><span class="lg">${LOGO.replace(/36/g,'72')}</span><h1>کارگاه گرافیک و تبلیغات</h1><small class="lb">دانشگاه محقق اردبیل · ترم سه · استاد علی حسین عباس‌زاده</small></div>
+  <div class="tl3"><a class="big3" href="?s=1" style="--a:#6c47ff;--b:#a855f7;--i:0"><span class="ic">🎒</span><b>ورود دانشجو</b><small>آپلود کار، ثبت ایده و امتیازدهی</small></a>
+  <a class="big3" href="?t=1" style="--a:#ec2f8c;--b:#f97316;--i:1"><span class="ic">🎓</span><b>ورود استاد</b><small>جدول امتیازها، ویترین و مدیریت کلاس</small></a></div></div><div id="toast"></div>`;}
+function tLogin(msg){document.body.className='stu';
+  document.body.innerHTML=`<div class="sw"><div class="hero"><span class="lg">${LOGO.replace(/36/g,'72')}</span><h1>ورود استاد</h1></div>
+  <div class="sr"><b>🎓 پنل استاد</b>${API?'':`<input id="tu" class="t" dir="ltr" placeholder="آدرس Web app (https://script.google.com/macros/s/…/exec)" value="${esc(cfg.get('url',''))}">`}
+  <input id="tk" class="t" type="password" dir="ltr" placeholder="کلید معلم (TEACHER_KEY)" value="${esc(cfg.get('key',''))}">
+  <button class="btn pri big" id="tg">ورود ✨</button><div class="lb" id="te" style="color:var(--danger)">${msg||''}</div></div><a class="tlink" href="?s=1">🎒 ورود دانشجو</a></div><div id="toast"></div>`;
+  const go=async()=>{const url=API||$('tu').value.trim(),key=$('tk').value.trim(),te=$('te');if(!url||!key)return te.textContent='آدرس و کلید را وارد کنید';
+    $('tg').disabled=true;te.textContent='در حال بررسی…';
+    try{const r=await post(url,{a:'all',key});if(r.err){$('tg').disabled=false;return te.textContent=r.err}
+      cfg.set('url',url);cfg.set('key',key);location.replace(location.pathname+'?t=1');}
+    catch(e){$('tg').disabled=false;te.textContent=e.message||'اتصال برقرار نشد'}};
+  $('tg').onclick=go;$('tk').onkeydown=e=>{if(e.key==='Enter')go()};}
+if(Q.has('t'))((cfg.get('key','')&&(cfg.get('url','')||API))?teacher:tLogin)();
+else if(Q.has('s')||cfg.get('num',''))student();
+else landing();
 </script>
 </body>
 </html>
