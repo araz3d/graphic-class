@@ -204,6 +204,31 @@ tbody tr:hover td{background:color-mix(in srgb,var(--brand) 8%,var(--card))}
 .upt{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}.upt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.upt small{color:var(--mute)}
 .mobsel{display:none}
 @media (max-width:760px){.mobsel{display:block;width:100%;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--card);margin-bottom:12px;font-weight:700}header{gap:8px;padding:10px 12px}.tabs{order:9;width:100%}.tab{flex:1}.logo h1{font-size:16px}#live{display:none}}
+/* ===== v5 · player, gallery, notes ===== */
+.pw{position:relative;aspect-ratio:16/9;width:100%;background:#000;border-radius:14px;overflow:hidden;margin-top:6px}
+.pbox .pw iframe,.modal .pw iframe,.pw iframe,.pw video{position:absolute;inset:0;width:100%;height:100%;margin:0;aspect-ratio:auto;border:0;border-radius:0;background:#000}
+.modal .pw{width:min(92vw,960px)}
+.pbar{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.pbar .btn{display:inline-flex!important;text-decoration:none;color:inherit;font-size:13px}
+.seg button:disabled{opacity:.5;filter:none;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.lk{display:inline-block;align-self:flex-start;background:color-mix(in srgb,var(--brand) 10%,var(--card));border:1px solid var(--line);border-radius:99px;padding:3px 12px}
+.sr[data-n] .th{width:112px;height:80px}
+.th .doc{font-size:30px}
+.tnote{border-top:4px solid var(--l2);background:color-mix(in srgb,var(--l2) 8%,var(--card))}.tnote p{white-space:pre-wrap;line-height:2;margin:0}
+.chips button.n::before{content:'';position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:var(--l2);box-shadow:0 0 0 2px var(--card)}
+.gal2{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.gt{position:relative;aspect-ratio:4/3;border-radius:20px;overflow:hidden;cursor:pointer;background:var(--card);border:1px solid var(--line);transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;animation:up .5s both;animation-delay:calc(var(--i,0)*45ms)}
+.gt:hover{transform:translateY(-5px) scale(1.015);box-shadow:0 18px 40px color-mix(in srgb,var(--brand) 30%,transparent)}
+.gt>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s}.gt:hover>img{transform:scale(1.08)}
+.gt>.doc{position:absolute;inset:0;font-size:46px}
+.gt::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#000b,transparent 55%);pointer-events:none}
+.gt .gi{position:absolute;bottom:10px;right:12px;left:12px;z-index:2;color:#fff;display:flex;flex-direction:column}.gt .gi small{opacity:.85}
+.gt .gp{position:absolute;inset:0;display:grid;place-items:center;z-index:2;pointer-events:none}
+.gt .gp i{width:54px;height:54px;border-radius:50%;background:#ffffffd9;color:#14122b;display:grid;place-items:center;font-style:normal;font-size:22px;box-shadow:0 8px 24px #0006;transition:.3s}.gt:hover .gp i{transform:scale(1.15)}
+.gt .gs{position:absolute;top:10px;left:10px;z-index:2;background:#fffffff2;font-size:14px}
+.gt .gn{position:absolute;top:10px;right:10px;z-index:2;background:#0008;color:#fff;border-radius:99px;padding:1px 9px;font-size:12px}
+.gt.em{border-style:dashed;display:grid;place-items:center;text-align:center;color:var(--mute);background:transparent}.gt.em::after{display:none}.gt.em:hover{transform:none;box-shadow:none}
+.vwrap{width:min(92vw,960px)}.vh{display:flex;align-items:center;gap:10px;margin-bottom:6px}.vh>div{flex:1;display:flex;flex-direction:column}.vh small{color:var(--mute)}
+.vn{display:flex;justify-content:space-between;gap:8px;margin-top:10px}.vn .btn:disabled{opacity:.4;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -260,9 +285,14 @@ const sname=s=>s===FINAL?'جلسه ۱۲ · ژوری و تحویل نهایی':'�
 const post=(u,d)=>fetch(u,{method:'POST',body:JSON.stringify(d)}).then(async r=>{const t=await r.text();try{return JSON.parse(t)}catch(e){throw new Error('پاسخ نامعتبر از سرور؛ نسخهٔ جدید Deploy نشده یا دسترسی Anyone نیست')}});
 const DR={th:(id,w)=>`https://drive.google.com/thumbnail?id=${id}&sz=w${w||600}`,pv:id=>`https://drive.google.com/file/d/${id}/preview`,view:id=>`https://drive.google.com/file/d/${id}/view`};
 const isImg=m=>/^image/.test(m.mime),isVid=m=>/^video/.test(m.mime);
-const mThumb=m=>isImg(m)||isVid(m)?`<img src="${DR.th(m.id)}" alt="" loading="lazy">`:`<div class="doc">📄</div>`;
+const mThumb=m=>isImg(m)||isVid(m)?`<img src="${DR.th(m.id)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'doc',textContent:'${isVid(m)?'🎬':'🖼️'}'}))">`:`<div class="doc">📄</div>`;
 const thb=(m,a,x)=>`<div class="th" ${a}>${mThumb(m)}${isVid(m)?'<span class="pl">▶</span>':''}${x?`<button class="x" data-del="${m.id}">×</button>`:''}</div>`;
-const mFull=m=>isImg(m)?`<img src="${DR.th(m.id,1600)}">`:`<iframe src="${DR.pv(m.id)}" allow="autoplay" allowfullscreen></iframe>`;
+const DRV=id=>`https://drive.google.com/uc?export=download&id=${id}`;
+const mFull=m=>isImg(m)?`<img src="${DR.th(m.id,1600)}" onerror="this.onerror=null;this.src='https://drive.google.com/uc?export=view&id=${m.id}'"><div class="pbar"><a class="btn" target="_blank" href="${DR.view(m.id)}">↗ باز کردن در Drive</a></div>`:
+ `<div class="pw"><iframe src="${DR.pv(m.id)}" allow="autoplay;fullscreen" allowfullscreen></iframe></div><div class="pbar"><button class="btn" data-fs="${m.id}">⛶ تمام‌صفحه</button>${isVid(m)?`<button class="btn" data-alt="${m.id}">🔁 پخش‌کنندهٔ دیگر</button>`:''}<a class="btn" target="_blank" href="${DR.view(m.id)}">↗ Drive</a></div>`;
+document.addEventListener('click',e=>{const f=e.target.closest('[data-fs]'),a=e.target.closest('[data-alt]');
+  if(f){const w=f.closest('.pbox,.box,.vwrap').querySelector('.pw'),r=w.requestFullscreen||w.webkitRequestFullscreen;r?r.call(w):window.open(DR.view(f.dataset.fs));}
+  if(a){a.closest('.pbox,.box,.vwrap').querySelector('.pw').innerHTML=`<video controls playsinline autoplay preload="metadata" src="${DRV(a.dataset.alt)}"></video>`;a.remove();}});
 const chart=(dn,sc)=>{const k=Object.values(dn).filter(Boolean).length,p=Math.round(k/N*100);
   return `<div class="ringw"><div class="ring" style="--p:${p}"><b>${fa(p)}٪</b></div><div><b>${fa(k)} از ${fa(N)}</b> جلسه تکمیل شده</div></div>
   <div class="pc">${Array.from({length:N},(_,i)=>{const s=i+1,d=dn[s],x=sc&&sc[s];return `<div class="pcol"><span class="tk">${d?'✓':''}</span><div class="pb2"><i style="height:${d?(x?Math.max(15,x/5*100):100):0}%"></i></div><small>${fa(s)}</small></div>`}).join('')}</div>`;};
@@ -306,7 +336,7 @@ function student(){
     try{const r=await post(u,{a:'student',num:n});if(r.err)return login(r.err);cfg.set('num',n);D={...r,num:n};loadSc();tab='home';view();}catch(e){login('اتصال برقرار نشد؛ اینترنت را بررسی کنید')}}
   const mine=(k,s)=>D.files.filter(f=>f.num===D.num&&f.s===s&&f.kind===k);
   const dn=()=>{const o={};for(let s=1;s<=N;s++)o[s]=D.done.includes(s);return o};
-  const chips=(cur,f)=>`<div class="chips" id="cc">${Array.from({length:N},(_,i)=>i+1).map(s=>`<button data-s="${s}" class="${s===cur?'on':''} ${f(s)?'d':''}">${fa(s)}</button>`).join('')}</div>`;
+  const chips=(cur,f,g)=>`<div class="chips" id="cc">${Array.from({length:N},(_,i)=>i+1).map(s=>`<button data-s="${s}" class="${s===cur?'on':''} ${f(s)?'d':''} ${g&&g(s)?'n':''}">${fa(s)}</button>`).join('')}</div>`;
   const openM=m=>{$('pb').innerHTML=mFull(m);$('pm').classList.add('on');};
   const top=t=>`<div class="hello"><button class="btn" data-go="home">→ خانه</button><h2>${t}</h2><span></span></div>`;
   const MAT=s=>D.files.filter(f=>f.kind==='material'&&f.s===s);
@@ -315,16 +345,17 @@ function student(){
   function home(){
     const my=D.files.filter(f=>f.num===D.num&&f.kind==='media').length,
       todo=others().filter(o=>D.files.some(f=>f.num===o.num&&f.s===rs&&f.kind==='media')&&!sc[o.num]).length,
-      mt=D.files.filter(f=>f.kind==='material').length;
-    const T=[['tasks','📁','تکلیف من','آپلود ویدئو و ثبت ایده هر جلسه','--a:#6c47ff;--b:#a855f7',my?fa(my)+' فایل':''],
+      mt=D.files.filter(f=>f.kind==='material').length,nn=(D.tnotes||[]).filter(x=>x.text).length;
+    const T=[['tasks','📁','تکلیف من','آپلود ویدئو و ثبت ایده هر جلسه','--a:#6c47ff;--b:#a855f7',nn?'📝 '+fa(nn)+' یادداشت':my?fa(my)+' فایل':''],
       ['rate','⭐','امتیازدهی','کار همکلاسی‌ها را ببین و امتیاز بده','--a:#ec2f8c;--b:#f97316',todo?fa(todo)+' کار جدید':''],
       ['mat','📚','مطالب استاد','محتوای تدریس‌شده در هر جلسه','--a:#06a8c9;--b:#12a150',mt?fa(mt)+' مطلب':'']];
     $('app').innerHTML=`<div class="hello"><div><small>خوش آمدی 👋</small><h2>${esc(D.me.name)}</h2></div><button class="btn" id="out">خروج</button></div>
       <div class="tl3">${T.map((t,i)=>`<button class="big3" data-go="${t[0]}" style="${t[4]};--i:${i}"><span class="ic">${t[1]}</span><b>${t[2]}</b><small>${t[3]}</small>${t[5]?`<em>${t[5]}</em>`:''}</button>`).join('')}</div>
       <div class="sr"><b>✅ پیشرفت من در ${fa(N)} جلسه</b>${chart(dn())}</div>`;}
   function tasks(){
-    const md=mine('media',cs),has=D.ideas.some(i=>i.s===cs&&i.text)||mine('idea',cs).length;
-    $('app').innerHTML=`${top('📁 تکلیف من')}${chips(cs,s=>D.done.includes(s))}
+    const md=mine('media',cs),tn=(D.tnotes||[]).find(x=>x.s===cs&&x.text),has=D.ideas.some(i=>i.s===cs&&i.text)||mine('idea',cs).length;
+    $('app').innerHTML=`${top('📁 تکلیف من')}${chips(cs,s=>D.done.includes(s),s=>(D.tnotes||[]).some(x=>x.s===s&&x.text))}
+      ${tn?`<div class="sr tnote"><b>📝 یادداشت استاد برای ${sname(cs)}</b><p>${esc(tn.text)}</p><small class="lb">اگر نیاز به اصلاح دارد، کار اصلاح‌شده را دوباره آپلود کن.</small></div>`:''}
       <div class="sr"><b>${sname(cs)}</b><label class="btn upl">🎬 آپلود ویدئو / فریم این جلسه<input type="file" id="fm" accept="image/*,video/*" multiple hidden></label>
       <div class="thumbs">${md.map(m=>thb(m,`data-m="${m.id}"`,true)).join('')||'<small class="lb">هنوز چیزی آپلود نشده</small>'}</div><div class="pg" id="pg" hidden><i></i></div></div>
       <button class="big3" data-idea="1" style="--a:#f59e0b;--b:#ec2f8c"><span class="ic">💡</span><b>ثبت ایده برای این جلسه</b><small>${has?'✓ ثبت شده · برای ویرایش بزن':'بنویس یا فایل PDF / DOC بده'}</small></button>
@@ -337,12 +368,15 @@ function student(){
       <div class="thumbs">${idf.map(f=>`<span class="btn" style="display:inline-flex;gap:8px"><a href="${DR.view(f.id)}" target="_blank">📄 ${esc(f.name)}</a><b data-del="${f.id}" style="cursor:pointer;color:var(--danger)">×</b></span>`).join('')}</div>
       <button class="btn" id="cls">بستن</button></div>`;$('pm').classList.add('on');}
   function rate(){
+    const L=others().map(o=>({o,fs:D.files.filter(f=>f.num===o.num&&f.s===rs&&f.kind==='media')})),W=L.filter(x=>x.fs.length),E=L.filter(x=>!x.fs.length),left=W.filter(x=>!sc[x.o.num]).length;
     $('app').innerHTML=`${top('⭐ امتیازدهی')}${LOCK?`<div class="lb"><b>${sname(rs)}</b> (قفل‌شده با لینک)</div>`:chips(rs,s=>D.files.some(f=>f.s===s&&f.kind==='media'&&f.num!==D.num))}
-      <div class="sr"><small>۱) روی کار همکلاسی بزن تا همان‌جا پخش شود ۲) کمی ببین؛ بعد دکمه‌های امتیاز باز می‌شود ۳) «ارسال امتیازها» را بزن.</small></div>
-      ${others().map(o=>{const fs=D.files.filter(f=>f.num===o.num&&f.s===rs&&f.kind==='media'),ok=fs.length&&seen[o.num+'|'+rs];
-        return `<div class="sr" data-n="${o.num}"><b>${esc(o.name)}</b>${fs.length?`<div class="thumbs">${fs.map(m=>thb(m,`data-m="${m.id}"`)).join('')}</div><div class="pbox"></div>`:''}
-        <div class="lb lk">${!fs.length?'هنوز کاری بارگذاری نکرده':ok?'✅ دیدی؛ امتیاز بده':'👆 برای فعال‌شدن امتیاز، کار را باز کن و ببین'}</div>
-        <div class="seg">${rateBtns(sc[o.num],!ok)}</div><div class="lb sl">${rateLbl(sc[o.num])}</div></div>`}).join('')}
+      <div class="sr"><div class="row" style="justify-content:space-between;align-items:center;margin:0"><b>${fa(W.length)} کار آماده · ${fa(left)} بدون امتیاز</b><button class="btn" data-refresh="1">⟳ بروزرسانی</button></div>
+      <small>۱) روی کار همکلاسی بزن تا همان‌جا با پلیر کامل پخش شود ۲) چند ثانیه ببین؛ دکمه‌های امتیاز فعال می‌شود ۳) «ارسال امتیازها» را بزن.</small></div>
+      ${W.map(({o,fs})=>{const ok=seen[o.num+'|'+rs];
+        return `<div class="sr" data-n="${o.num}"><b>${esc(o.name)}</b><div class="thumbs">${fs.map(m=>thb(m,`data-m="${m.id}"`)).join('')}</div><div class="pbox"></div>
+        <div class="lb lk">${ok?'✅ دیدی؛ امتیاز بده':'👆 کار را باز کن و ببین تا امتیاز فعال شود'}</div>
+        <div class="seg">${rateBtns(sc[o.num],!ok)}</div><div class="lb sl">${rateLbl(sc[o.num])}</div></div>`}).join('')||'<div class="empty">هنوز کاری برای این جلسه بارگذاری نشده<br><small>بعداً «بروزرسانی» را بزن</small></div>'}
+      ${E.length?`<div class="sr"><small class="lb">هنوز کاری بارگذاری نکرده‌اند: ${E.map(x=>esc(x.o.name)).join('، ')}</small></div>`:''}
       <button class="btn pri big" id="send">ارسال امتیازها 🚀</button>`;}
   function mat(){
     const fs=MAT(ms),nt=(D.notes||[]).find(i=>i.s===ms&&i.text);
@@ -352,7 +386,8 @@ function student(){
       ${!nt&&!fs.length?'<div class="empty">هنوز مطلبی برای این جلسه قرار داده نشده</div>':''}</div>`;}
   async function click(e){
     const t=e.target,go=t.closest('[data-go]');
-    if(go){tab=go.dataset.go;view();return window.scrollTo(0,0);}
+    if(go){tab=go.dataset.go;if(tab!=='home'){$('app').innerHTML='<div class="empty">⏳ در حال دریافت کارها…</div>';try{await refresh()}catch(x){}}view();return window.scrollTo(0,0);}
+    if(t.closest('[data-refresh]')){$('app').innerHTML='<div class="empty">⏳ در حال دریافت کارها…</div>';try{await refresh();toast('به‌روز شد ✓')}catch(x){toast('دریافت نشد؛ اینترنت را بررسی کنید')}return view();}
     if(t.id==='out'){cfg.set('num','');D=null;return login();}
     if(t.closest('[data-idea]'))return ideaModal();
     if(t.id==='cls'){$('pm').classList.remove('on');$('pb').innerHTML='';return view();}
@@ -422,6 +457,7 @@ async function load(){
 const allM=()=>Object.values(mediaByKey).flat();
 function openM(id){const m=allM().find(x=>x.id===id);if(!m)return;
   $('pb').innerHTML=mFull(m)+`<div style="text-align:center;margin-top:8px;color:var(--mute)">${esc(m.name)} · <a href="${DR.view(m.id)}" target="_blank">باز کردن در Drive</a></div>`;$('pm').classList.add('on');}
+const pushNotes=u=>{const l=[];students.forEach(st=>sessions().forEach(s=>{const r=recs[key(st.id,s)];if(r&&r.note)l.push({num:st.num,s,text:r.note})}));if(l.length)post(u,{a:'note',key:cfg.get('key',''),list:l}).catch(()=>{})};
 const pushRoster=()=>{const u=(cfg.get('url','')||API),k=cfg.get('key','');if(u&&k)post(u,{a:'roster',key:k,list:students.map(s=>({num:s.num,name:s.name}))}).catch(()=>{});};
 
 function renderList(){
@@ -441,7 +477,7 @@ function card(sid,s){
     <div class="lb">${r.rating?rateLbl(r.rating):'امتیاز استاد را انتخاب کنید'}${o?` · همکلاسی‌ها: <b>${fa(o.sum/o.n)}</b> از ۵ (${fa(o.n)} رأی)`:''}</div>
     ${me.length?`<div class="thumbs">${me.map(m=>thb(m,`data-m="${m.id}"`)).join('')}</div>`:'<div class="lb">ویدئو/فریمی توسط دانشجو بارگذاری نشده</div>'}
     <div class="idea"><b>💡 ایده</b>${idea&&idea.text?`<p>${esc(idea.text)}</p>`:''}${idf.map(f=>`<a class="btn" target="_blank" href="${DR.view(f.id)}">📄 ${esc(f.name)}</a>`).join(' ')}${(idea&&idea.text)||idf.length?'':'<small class="lb">ثبت نشده</small>'}</div>
-    <textarea class="note" placeholder="یادداشت…" rows="1">${esc(r.note)}</textarea></div>`;
+    <textarea class="note" placeholder="📝 یادداشت برای دانشجو (در صفحهٔ تکلیف او دیده می‌شود)" rows="2">${esc(r.note)}</textarea></div>`;
 }
 
 function renderStudent(scrollTo){
@@ -472,12 +508,21 @@ function renderMatrix(){
     <tr class="f2"><td class="nm">میانگین کلاس</td>${avgs.map(a=>`<td>${fa(a)}</td>`).join('')}<td class="lt l3"></td><td class="lt l2">${fa(allAvg)}</td><td class="lt l1">${allAvg?fa(allAvg*4):'—'}</td><td class="lt l0"></td></tr></tfoot></table></div>`;
 }
 
+let VW={l:[],i:0};
+function viewer(l,i){VW={l,i};drawV();$('pm').classList.add('on');}
+function drawV(){const{l,i}=VW,x=l[i];
+  $('pb').innerHTML=`<div class="vwrap"><div class="vh"><div><b>${esc(x.name)}</b><small>${esc(x.m.name)} · ${fa(i+1)} از ${fa(l.length)}</small></div>${x.sc?`<span class="chip lv${lvOf(x.sc)}">${fa(x.sc)}</span>`:''}<button class="btn" id="vx">✕</button></div>${mFull(x.m)}
+  <div class="vn"><button class="btn" data-vn="-1" ${i>0?'':'disabled'}>→ قبلی</button><button class="btn" data-vn="1" ${i<l.length-1?'':'disabled'}>بعدی ←</button></div></div>`;}
+const hasM=(st,s)=>(mediaByKey[key(st.id,s)]||[]).some(f=>f.kind==='media');
+function galList(){const l=[];students.forEach(st=>(mediaByKey[key(st.id,gs)]||[]).filter(f=>f.kind==='media').forEach(m=>l.push({m,name:st.name,id:st.id,sc:score(st.id,gs)})));return l}
 function renderGallery(){
-  $('view').innerHTML=`<div class="shead"><h2>ویترین کارها</h2><select id="gs">${sessions().map(s=>`<option value="${s}" ${s===gs?'selected':''}>${sname(s)}</option>`).join('')}</select>
-    <button class="btn pri" id="bLink">🔗 لینک امتیازدهی این جلسه</button><span style="color:var(--mute)">برای نمایش در کلاس؛ روی هر کار بزنید تا بزرگ شود.</span></div>
-    <div class="gal">${students.map(st=>{const m=(mediaByKey[key(st.id,gs)]||[]).filter(f=>f.kind==='media')[0],x=score(st.id,gs);
-      return `<div class="tile" data-m="${m?m.id:''}" data-id="${st.id}">${m?mThumb(m):'<div class="ph">کاری بارگذاری نشده</div>'}
-      <div class="tl"><b>${esc(st.name)}</b>${x?`<span class="chip lv${lvOf(x)}">${fa(x)}</span>`:''}</div></div>`}).join('')}</div>`;
+  const L=galList(),n=students.filter(st=>hasM(st,gs)).length;
+  $('view').innerHTML=`<div class="shead"><h2>🎞️ ویترین کارها</h2><span class="sp"></span><div class="kpi"><div><b>${fa(n)}/${fa(students.length)}</b><small>تحویل</small></div><div><b>${fa(L.length)}</b><small>فایل</small></div></div>
+    <button class="btn pri" id="bPlay">▶ شروع نمایش</button><button class="btn" id="bLink">🔗 لینک امتیازدهی</button></div>
+    <div class="chips" style="margin-bottom:16px">${sessions().map(s=>`<button data-gs="${s}" class="${s===gs?'on':''} ${students.some(st=>hasM(st,s))?'d':''}">${fa(s)}</button>`).join('')}</div>
+    <div class="gal2">${students.map((st,i)=>{const fs=(mediaByKey[key(st.id,gs)]||[]).filter(f=>f.kind==='media'),m=fs[0],x=score(st.id,gs);
+      return m?`<div class="gt" style="--i:${i}" data-m="${m.id}" data-id="${st.id}">${mThumb(m)}${isVid(m)?'<span class="gp"><i>▶</i></span>':''}${fs.length>1?`<span class="gn">${fa(fs.length)} فایل</span>`:''}${x?`<span class="gs chip lv${lvOf(x)}">${fa(x)}</span>`:''}<div class="gi"><b>${esc(st.name)}</b><small>${isVid(m)?'🎬 ویدئو':'🖼️ تصویر'}</small></div></div>`
+      :`<div class="gt em" style="--i:${i}" data-id="${st.id}"><div>📭<br><b>${esc(st.name)}</b><br><small>کاری بارگذاری نشده</small></div></div>`}).join('')}</div>`;
 }
 function render(){renderList();({stu:renderStudent,mx:renderMatrix,gal:renderGallery})[tab]();const kk=tab+cur+gs;if(kk!==lastKey){lastKey=kk;const v=$('view');v.classList.remove('in');void v.offsetWidth;v.classList.add('in');setTimeout(()=>v.classList.remove('in'),900);}
   $('side').style.display=tab==='stu'?'flex':'none';}
@@ -490,8 +535,10 @@ $('list').onclick=e=>{const c=e.target.closest('.st');if(c){cur=+c.dataset.id;re
 $('view').addEventListener('click',async e=>{
   const c=e.target.closest('.c[data-id]');
   if(c){cur=+c.dataset.id;setTab('stu');renderList();$('side').style.display='flex';renderStudent(+c.dataset.s);return;}
-  const tl=e.target.closest('.tile');
-  if(tl){if(tl.dataset.m)openM(tl.dataset.m);else{cur=+tl.dataset.id;setTab('stu');render();}return;}
+  const gc=e.target.closest('[data-gs]');if(gc){gs=+gc.dataset.gs;return renderGallery();}
+  if(e.target.id==='bPlay'){const l=galList();return l.length?viewer(l,0):toast('کاری برای نمایش نیست');}
+  const tl=e.target.closest('.gt');
+  if(tl){if(tl.dataset.m){const l=galList();viewer(l,Math.max(0,l.findIndex(x=>x.m.id===tl.dataset.m)));}else{cur=+tl.dataset.id;setTab('stu');render();}return;}
   if(e.target.id==='bLink'){const h=cfg.get('host',''),u=(cfg.get('url','')||API);if(!h||!u){toast('ابتدا آدرس اتصال و میزبانی را در ⚙️ وارد کنید');return settings();}return copy(h.split('?')[0]+'?s=1&c='+gs+'&u='+encodeURIComponent(u));}
   if(e.target.id==='bEd')return editStudent(cur);
   if(e.target.id==='bDel'){const s=students.find(x=>x.id===cur);
@@ -513,10 +560,12 @@ $('view').addEventListener('change',async e=>{
     const st=students.find(x=>x.id===cur),u=(cfg.get('url','')||API);
     if(u)post(u,{a:'done',key:cfg.get('key',''),num:st.num,s,done:r.done}).then(x=>{if(x.err)toast(x.err)}).catch(()=>toast('ثبت روی سرور ناموفق بود'));
     renderStudent();renderList();}
-  if(e.target.classList.contains('note')){const r=rec(cur,s);r.note=e.target.value;await saveRec(r);}
+  if(e.target.classList.contains('note')){const r=rec(cur,s);r.note=e.target.value;await saveRec(r);const st=students.find(x=>x.id===cur),nu=(cfg.get('url','')||API);
+    if(nu)post(nu,{a:'note',key:cfg.get('key',''),list:[{num:st.num,s,text:r.note}]}).then(x=>x.err?toast(x.err):toast('یادداشت برای دانشجو ثبت شد ✓')).catch(()=>toast('ثبت یادداشت روی سرور ناموفق بود'));}
 });
 $('pm').onclick=e=>{if(e.target.id==='pm'){$('pm').classList.remove('on');$('pb').innerHTML='';}};
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('pm').classList.remove('on');$('pb').innerHTML='';$('fmod').classList.remove('on');}});
+$('pm').addEventListener('click',e=>{const n=e.target.closest('[data-vn]');if(n){VW.i+=+n.dataset.vn;drawV();}if(e.target.id==='vx'){$('pm').classList.remove('on');$('pb').innerHTML='';}});
+document.addEventListener('keydown',e=>{if($('pm').classList.contains('on')&&$('pb').querySelector('.vwrap')){const d=e.key==='ArrowLeft'?1:e.key==='ArrowRight'?-1:0,n=VW.i+d;if(d&&n>=0&&n<VW.l.length){VW.i=n;drawV();}}if(e.key==='Escape'){$('pm').classList.remove('on');$('pb').innerHTML='';$('fmod').classList.remove('on');}});
 
 /* ---- add/edit student ---- */
 function editStudent(id){
@@ -537,7 +586,7 @@ $('bAdd').onclick=()=>editStudent(null);
 async function sync(q){
   const u=(cfg.get('url','')||API);if(!u){if(q)return;toast('ابتدا آدرس اتصال را در ⚙️ تنظیمات وارد کنید');return settings();}
   if(!q)toast('در حال دریافت اطلاعات…');
-  if(!sync.r){sync.r=1;pushRoster();}
+  if(!sync.r){sync.r=1;pushRoster();pushNotes(u);}
   try{const a=await post(u,{a:'all',key:cfg.get('key','')});if(a.err){if(/کلید/.test(a.err)){cfg.set('key','');location.replace(location.pathname+'?t=1');return}if(!q)toast(a.err);return;}
     srv={files:a.files||[],ideas:a.ideas||[],done:a.done||[]};
     const best={};(a.votes||[]).forEach(v=>{if(v.rater===v.target||!(v.score>=1&&v.score<=5))return;const k=v.rater+'|'+v.s+'|'+v.target;if(!best[k]||v.t>=best[k].t)best[k]={...v,k};});
