@@ -4,6 +4,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>گرافیک و تبلیغات — دانشگاه محقق اردبیل · ترم سه</title>
+<link rel="manifest" href="manifest.webmanifest" id="mf">
+<meta name="theme-color" content="#2b1a72">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="گرافیک و تبلیغات">
+<link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png">
+<script>
+/* PWA: نسخهٔ دانشجو با لینک خودش نصب می‌شود */
+if(new URLSearchParams(location.search).has('s')){fetch('manifest.webmanifest').then(r=>r.json()).then(m=>{m.start_url=location.href;m.id='student';m.name='امتیازدهی کلاس گرافیک';m.short_name='امتیازدهی';m.scope=new URL('./',location.href).href;m.icons=m.icons.map(i=>({...i,src:new URL(i.src,location.href).href}));document.getElementById('mf').href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/manifest+json'}))}).catch(()=>{})}
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+/* دکمهٔ نصب */
+let _ip;const _ios=/iphone|ipad|ipod/i.test(navigator.userAgent),_sa=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+function _btn(t,f){if(_sa||document.getElementById('inst'))return;const b=document.createElement('button');b.id='inst';b.textContent=t;b.onclick=f;b.style.cssText='position:fixed;bottom:14px;left:14px;z-index:60;border:0;border-radius:99px;padding:10px 16px;color:#fff;font:inherit;font-weight:700;cursor:pointer;background:linear-gradient(120deg,#6c47ff,#ec2f8c);box-shadow:0 8px 24px #6c47ff66';document.addEventListener('DOMContentLoaded',()=>document.body.appendChild(b));if(document.body)document.body.appendChild(b)}
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();_ip=e;_btn('📲 نصب اپ',async()=>{_ip.prompt();await _ip.userChoice;document.getElementById('inst')?.remove()})});
+if(_ios&&!_sa)_btn('📲 نصب روی آیفون',()=>alert('در Safari دکمهٔ Share (مربع با فلش) را بزنید و «Add to Home Screen» را انتخاب کنید.'));
+addEventListener('appinstalled',()=>document.getElementById('inst')?.remove());
+</script>
+
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f6f5fb;--card:#fff;--ink:#14122b;--mute:#6f6c8a;--line:#e6e3f3;--brand:#6c47ff;--ok:#12a150;--okbg:#e5f7ec;--danger:#e5484d;
@@ -408,7 +425,8 @@ const LV={1:['شروع خوب','🌱'],2:['خوب','🙂'],3:['بسیار خوب
 function burst(el){const r=el.getBoundingClientRect();for(let i=0;i<14;i++){const p=document.createElement('i'),a=Math.random()*6.28,d=30+Math.random()*50;p.className='pt';p.style.cssText=`left:${r.left+r.width/2}px;top:${r.top+r.height/2}px;background:${['#00b8d9','#ff2e88','#ffc928','#6c47ff'][i%4]};--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px`;document.body.appendChild(p);setTimeout(()=>p.remove(),700);}}
 const SEED=[{"num":"40411503101","name":"ادهم حدیث"},{"num":"40411503102","name":"اصغرنژاد عسل"},{"num":"40411503103","name":"افتخاری کرده ده روژینا"},{"num":"40411503104","name":"امیران بستان اباد زهرا"},{"num":"40411503105","name":"ایمانی اشنار سما"},{"num":"40411503106","name":"بایرامی حسنا"},{"num":"40411503108","name":"حسین پورمعتمد ساینا"},{"num":"40411503109","name":"رجبی لاسکی ستایش"},{"num":"40411503110","name":"عباسی جومیلو بیتا"},{"num":"40511503221","name":"عبداللهی مهدی"},{"num":"40411503111","name":"علی زاده مانیا"},{"num":"40411503112","name":"غفاری یایچی ایدا"},{"num":"40411503113","name":"معانی فاطمه"},{"num":"40411503114","name":"ملکی هلیا"},{"num":"40411503115","name":"منوری اسما"},{"num":"40411503117","name":"مهرپرور سیده معصومه"},{"num":"40411503118","name":"نیک منش مهدیه"},{"num":"40411503119","name":"هاتف هریس اسما"},{"num":"40411503120","name":"هریک دیزجی دینا"}];
 const LOGO='<svg viewBox="0 0 40 40" width="36" height="36"><g style="mix-blend-mode:screen"><circle cx="15" cy="15" r="10" fill="#00b8d9"/><circle cx="25" cy="15" r="10" fill="#ff2e88"/><circle cx="20" cy="24" r="10" fill="#ffc928"/></g></svg>';
-const Q=new URLSearchParams(location.search),STU=Q.has('s');
+let _q=location.search;try{if(/[?&]s=/.test(_q))localStorage.setItem('ct_lastq',_q);else if(!_q&&(matchMedia('(display-mode: standalone)').matches||navigator.standalone)&&localStorage.getItem('ct_lastq')&&localStorage.getItem('ct_role')==='stu')_q=localStorage.getItem('ct_lastq');if(/[?&]s=/.test(_q))localStorage.setItem('ct_role','stu')}catch(e){}
+const Q=new URLSearchParams(_q),STU=Q.has('s');
 const cfg={get:(k,d)=>{try{return localStorage.getItem('ct_'+k)??d}catch(e){return d}},set:(k,v)=>{try{localStorage.setItem('ct_'+k,v)}catch(e){}}};
 const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fa=n=>n==null?'—':(+n).toLocaleString('fa-IR',{maximumFractionDigits:1});
