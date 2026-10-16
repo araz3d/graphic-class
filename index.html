@@ -461,7 +461,7 @@ const DRV=id=>`https://drive.google.com/uc?export=download&id=${id}`;
 const IFR=id=>`<iframe src="${DR.pv(id)}" allow="autoplay;fullscreen" allowfullscreen></iframe>`;
 const pwHtml=m=>API_KEY&&isVid(m)?`<div class="pw"><video controls playsinline preload="metadata" poster="${DR.th(m.id,1280)}" src="https://www.googleapis.com/drive/v3/files/${m.id}?alt=media&key=${API_KEY}" onerror="this.parentNode.classList.add('cr');this.outerHTML=IFR('${m.id}')"></video><button class="fx">✕</button></div>`:`<div class="pw cr">${IFR(m.id)}<button class="fx">✕</button></div>`;
 const AUD=f=>/^audio/.test(f.mime||'');
-const idLink=f=>isImg(f)?`<a href="${DR.view(f.id)}" target="_blank" style="position:relative;display:inline-block"><img src="${DR.th(f.id,360)}" alt="" style="width:92px;height:92px;object-fit:cover;border-radius:12px;display:block">${/^AI-/.test(f.name)?'<i style="position:absolute;top:4px;left:4px;background:#6c47ff;color:#fff;border-radius:99px;padding:0 7px;font-size:10px;font-style:normal;font-weight:800">AI</i>':''}</a>`:AUD(f)&&API_KEY?`<audio controls preload="none" src="https://www.googleapis.com/drive/v3/files/${f.id}?alt=media&key=${API_KEY}" style="height:38px;max-width:100%"></audio>`:`<a href="${DR.view(f.id)}" target="_blank">${AUD(f)?'🎙️':'📄'} ${esc(f.name)}</a>`;
+const idLink=f=>isImg(f)?`<a href="${DR.view(f.id)}" target="_blank" style="position:relative;display:inline-block"><img src="${DR.th(f.id,360)}" alt="" style="width:128px;height:128px;object-fit:cover;border-radius:12px;display:block">${/^AI-/.test(f.name)?'<i style="position:absolute;top:4px;left:4px;background:#6c47ff;color:#fff;border-radius:99px;padding:0 7px;font-size:10px;font-style:normal;font-weight:800">AI</i>':''}</a>`:AUD(f)&&API_KEY?`<audio controls preload="none" src="https://www.googleapis.com/drive/v3/files/${f.id}?alt=media&key=${API_KEY}" style="height:38px;max-width:100%"></audio>`:`<a href="${DR.view(f.id)}" target="_blank">${AUD(f)?'🎙️':'📄'} ${esc(f.name)}</a>`;
 const mFull=m=>isImg(m)?`<img src="${DR.th(m.id,1600)}" onerror="this.onerror=null;this.src='https://drive.google.com/uc?export=view&id=${m.id}'"><div class="pbar"><a class="btn" target="_blank" href="${DR.view(m.id)}">↗ باز کردن در Drive</a></div>`:
  `${pwHtml(m)}<div class="pbar"><button class="btn" data-fs="${m.id}">⛶ تمام‌صفحه</button><a class="btn" target="_blank" href="${DR.view(m.id)}">↗ Drive</a></div>`;
 document.addEventListener('click',e=>{const f=e.target.closest('[data-fs]'),a=e.target.closest('[data-alt]');
@@ -593,7 +593,10 @@ function student(){
     $('pb').innerHTML=`<div class="fm"><h3 style="margin:0">💡 ایدهٔ ${sname(cs)}</h3>
       <textarea id="idt" rows="6" class="t" placeholder="ایده‌ات را اینجا بنویس…">${esc(idea?idea.text:'')}</textarea><button class="btn pri" id="ids">ذخیره متن ایده</button>
       <div class="lb" style="text-align:center">— یا —</div>
-      <div class="sr" style="margin:0"><b>🎨 تصویرسازی با هوش مصنوعی</b><small>ایده را بنویس؛ هوش مصنوعی آن را به ۴ فریم استوری‌بورد تبدیل می‌کند (هر جلسه حداکثر ۲ بار). تصویرها فقط برای الهام و مودبورد هستند و متن فارسی روی آن‌ها نمی‌نشیند.</small><button class="btn pri" id="aib" type="button">🎨 ساخت ۴ فریم استوری‌بورد</button><div class="lb" id="aist"></div></div>
+      <div class="sr" style="margin:0"><b>🎨 تصویرسازی سینمایی با هوش مصنوعی</b><small>روش ۱: فقط ایده را در کادر بالا بنویس تا خودکار به ۴ پلان سینمایی تبدیل شود. روش ۲: پلان‌هایت را کامل بنویس (فضا، دوربین، نور، متریال، رنگ) و هر پلان را با یک خط خالی جدا کن؛ تصویر دقیقاً همان را می‌سازد (تا ۴ پلان). متن روی تصویر ساخته نمی‌شود.</small>
+        <textarea id="aip" rows="5" class="t" placeholder="پلان‌های دلخواه (اختیاری)&#10;&#10;پلان ۱: نمای باز، سحرگاه، مه سبک، لنز ۲۴ میلی‌متر…&#10;&#10;پلان ۲: …"></textarea>
+        <select id="ais" class="t"><option value="cinematic">🎬 سینمایی و رئال</option><option value="product">📷 عکاسی تبلیغاتی / محصول</option><option value="concept">🎨 کانسپت آرت</option><option value="sketch">✏️ استوری‌بورد خطی</option></select>
+        <button class="btn pri" id="aib" type="button">🎬 ساخت تصاویر</button><div class="lb" id="aist"></div></div>
       <div class="rec" id="rbox"><button class="btn pri" id="rec" type="button">🎙️ ضبط صدا با میکروفون</button></div>
       <label class="btn upl">📎 آپلود فایل (PDF / DOC / TXT / صوتی از گوشی یا سیستم)<input type="file" id="fi" accept=".pdf,.doc,.docx,.txt,audio/*" hidden></label><div class="pg" id="pg" hidden><i></i></div>
       <div class="thumbs">${idf.map(f=>`<span class="btn" style="display:inline-flex;gap:8px">${idLink(f)}<b data-del="${f.id}" style="cursor:pointer;color:var(--danger)">×</b></span>`).join('')}</div>
@@ -659,12 +662,13 @@ function student(){
       MI=setInterval(()=>{const q=Math.floor((Date.now()-MT)/1000),z=q%60;if($('rtm'))$('rtm').textContent=fa(Math.floor(q/60))+':'+(z<10?'۰':'')+fa(z);if(q>=300)recStop();},500);
     }catch(err){toast('دسترسی به میکروفون داده نشد')}}
   function recStop(){if(MR&&MR.state==='recording')MR.stop();}
-  async function aiGen(b){const tx=$('idt').value.trim();if(tx.length<8)return toast('اول ایده‌ات را کمی کامل‌تر بنویس');
+  async function aiGen(b){const tx=$('idt').value.trim(),sh=($('aip').value||'').split(/\n\s*\n/).map(x=>x.trim()).filter(x=>x.length>=8).slice(0,4),sty=$('ais').value;
+    if(!sh.length&&tx.length<8)return toast('ایده یا پلان‌هایت را کمی کامل‌تر بنویس');
     b.disabled=true;const set=t=>{const e=$('aist');if(e)e.textContent=t};
-    try{await post(u,{a:'idea',num:D.num,s:cs,text:tx});set('🧠 در حال تقسیم ایده به ۴ صحنه…');
-      const p=await post(u,{a:'aiplan',num:D.num,s:cs,text:tx});if(p.err)throw new Error(p.err);
-      for(let i=0;i<4;i++){set('🎨 ساخت فریم '+fa(i+1)+' از ۴ … (چند ثانیه)');const r=await post(u,{a:'aiimg',num:D.num,s:cs,i,prompt:p.prompts[i]});if(r.err)throw new Error(r.err);}
-      burst(b);toast('استوری‌بورد آماده شد 🎉');await refresh();ideaModal();}
+    try{if(tx.length>=8)await post(u,{a:'idea',num:D.num,s:cs,text:tx});set('🧠 در حال طراحی پلان‌های سینمایی…');
+      const p=await post(u,{a:'aiplan',num:D.num,s:cs,text:tx,shots:sh});if(p.err)throw new Error(p.err);
+      for(let i=0;i<p.prompts.length;i++){set('🎬 ساخت پلان '+fa(i+1)+' از '+fa(p.prompts.length)+' … (چند ثانیه)');const r=await post(u,{a:'aiimg',num:D.num,s:cs,i,prompt:p.prompts[i],style:sty});if(r.err)throw new Error(r.err);}
+      burst(b);toast('تصاویر آماده شد 🎉');await refresh();ideaModal();}
     catch(e){set('⚠️ '+e.message);b.disabled=false;}}
   async function recSend(){if(!MB)return;const ext=/mp4/.test(MB.type)?'m4a':'webm',f=new File([MB],'voice-s'+cs+'.'+ext,{type:MB.type.split(';')[0]});MB=null;UP.begin(1);
     try{await uploadFile(u,{num:D.num},f,'idea',cs,0);UP.end(true,'صدای ایده ارسال شد 🎙️');burst(document.body);await refresh();ideaModal();}catch(err){UP.end(false,'ارسال ناموفق: '+err.message)}}
