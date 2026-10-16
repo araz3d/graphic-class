@@ -429,6 +429,26 @@ body::after{width:42vw;height:42vw;left:-12vw;bottom:-18vw;background:#ec2f8c4d;
 .rec{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;width:100%}
 .rec .dot{width:12px;height:12px;border-radius:50%;background:#e5484d;animation:pls 1s infinite}.rec audio{width:100%}
 .snx{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.snx input{width:70px;text-align:center}
+
+/* ===== اسکرول‌بار هماهنگ با طراحی ===== */
+:root{color-scheme:light}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark}}
+*{scrollbar-width:thin;scrollbar-color:#8f74ffcc transparent}
+@supports selector(::-webkit-scrollbar){
+  *{scrollbar-width:auto;scrollbar-color:auto}
+  ::-webkit-scrollbar{width:12px;height:12px}
+  ::-webkit-scrollbar-track{background:transparent;margin:6px}
+  ::-webkit-scrollbar-thumb{min-height:44px;min-width:44px;border-radius:99px;border:4px solid transparent;background-clip:padding-box;
+    background-image:linear-gradient(180deg,#00b8d9,#6c47ff 55%,#ec2f8c)}
+  ::-webkit-scrollbar-thumb:horizontal{background-image:linear-gradient(90deg,#00b8d9,#6c47ff 55%,#ec2f8c)}
+  ::-webkit-scrollbar-thumb:hover{border-width:2px;background-image:linear-gradient(180deg,#22d3ee,#8f74ff 55%,#ff4fa3)}
+  ::-webkit-scrollbar-thumb:horizontal:hover{background-image:linear-gradient(90deg,#22d3ee,#8f74ff 55%,#ff4fa3)}
+  ::-webkit-scrollbar-thumb:active{border-width:1px}
+  ::-webkit-scrollbar-corner{background:transparent}
+}
+textarea{scrollbar-gutter:auto}
+/* نوار پیشرفت اسکرول زیر هدر */
+header::after{content:"";position:absolute;right:0;bottom:0;height:3px;width:calc(var(--sp,0)*100%);background:linear-gradient(270deg,#00b8d9,#6c47ff,#ec2f8c,#ffc928);box-shadow:0 0 12px #ec2f8c;border-radius:3px 0 0 3px;transition:width .12s linear;pointer-events:none}
 </style>
 <script>
 let N=12,FINAL=12;const setN=n=>{N=Math.max(1,Math.min(30,Math.round(+n)||12));FINAL=N};
@@ -813,6 +833,7 @@ const setTab=t=>{tab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.
 
 /* ---- events ---- */
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{setTab(b.dataset.t);render();});
+{const sv=$('view');sv.addEventListener('scroll',()=>{const m=sv.scrollHeight-sv.clientHeight;document.body.style.setProperty('--sp',m>0?(sv.scrollTop/m).toFixed(4):0)},{passive:true});}
 $('q').oninput=e=>{filter=e.target.value;renderList();};
 $('list').onclick=e=>{const c=e.target.closest('.st');if(c){cur=+c.dataset.id;render();}};
 $('view').addEventListener('click',async e=>{
