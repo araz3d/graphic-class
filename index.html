@@ -429,8 +429,11 @@ body::after{width:42vw;height:42vw;left:-12vw;bottom:-18vw;background:#ec2f8c4d;
 .rec{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;width:100%}
 .rec .dot{width:12px;height:12px;border-radius:50%;background:#e5484d;animation:pls 1s infinite}.rec audio{width:100%}
 .snx{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.snx input{width:70px;text-align:center}
-.mtxt{max-height:56vh;overflow-y:auto;overscroll-behavior:contain;margin:6px 0 2px;padding:4px 12px;border-radius:14px;background:color-mix(in srgb,var(--card) 60%,transparent);border:1px solid #ffffff14;scrollbar-width:thin;scrollbar-color:#a855f7 transparent}
+.mtxt{max-height:156px;transition:max-height .35s;overflow-y:auto;overscroll-behavior:contain;margin:6px 0 2px;padding:4px 12px;border-radius:14px;background:color-mix(in srgb,var(--card) 60%,transparent);border:1px solid #ffffff14;scrollbar-width:thin;scrollbar-color:#a855f7 transparent}
 .mtxt::-webkit-scrollbar{width:8px}.mtxt::-webkit-scrollbar-thumb{background:linear-gradient(#6c47ff,#ec2f8c);border-radius:8px}.mtxt::-webkit-scrollbar-track{background:#ffffff0d;border-radius:8px}
+.mtxt.open{max-height:68vh}
+.mtw{position:relative}.mtw:not(.o)::after{content:'';position:absolute;left:0;right:0;bottom:0;height:38px;border-radius:0 0 14px 14px;background:linear-gradient(transparent,var(--card));pointer-events:none}
+.mtg{display:block;margin:8px auto 0}
 </style>
 <script>
 let N=12,FINAL=12;const setN=n=>{N=Math.max(1,Math.min(30,Math.round(+n)||12));FINAL=N};
@@ -499,6 +502,7 @@ document.addEventListener('click',async e=>{const b=e.target.closest('[data-px]'
   new MutationObserver(sync).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
   addEventListener('popstate',()=>{if(skip){skip=false;return}if(on){on=false;closeAll()}});
 })();
+document.addEventListener('click',e=>{const b=e.target.closest('[data-mtg]');if(!b)return;const w=b.parentNode.querySelector('.mtw'),x=w.querySelector('.mtxt'),o=!x.classList.contains('open');x.classList.toggle('open',o);w.classList.toggle('o',o);b.textContent=o?'▴ جمع کردن متن':'▾ نمایش کامل متن';if(!o)x.scrollTop=0;},true);
 const chart=(dn,sc)=>{const k=Object.values(dn).filter(Boolean).length,p=Math.round(k/N*100);
   return `<div class="ringw"><div class="ring" style="--p:${p}"><b>${fa(p)}٪</b></div><div><b>${fa(k)} از ${fa(N)}</b> جلسه تکمیل شده</div></div>
   <div class="pc">${Array.from({length:N},(_,i)=>{const s=i+1,d=dn[s],x=sc&&sc[s];return `<div class="pcol"><span class="tk">${d?'✓':''}</span><div class="pb2"><i style="height:${d?(x?Math.max(15,x/5*100):100):0}%"></i></div><small>${fa(s)}</small></div>`}).join('')}</div>`;};
@@ -651,9 +655,9 @@ function student(){
   function mat(){
     const fs=MAT(ms),nt=(D.notes||[]).find(i=>i.s===ms&&i.text);
     $('app').innerHTML=`${top('📚 مطالب تدریس‌شده')}${chips(ms,s=>MAT(s).length||(D.notes||[]).some(i=>i.s===s&&i.text))}
-      <div class="sr"><b>${sname(ms)}</b>${nt?`<div class="mtxt"><p style="white-space:pre-wrap;line-height:2;margin:4px 0">${esc(nt.text)}</p></div>${nt.text.length>500?'<small class="lb">↕ برای خواندن ادامهٔ متن، داخل کادر بکشید</small>':''}`:''}
+      <div class="sr"><b>${sname(ms)}</b>${nt?`<div class="mtw"><div class="mtxt"><p style="white-space:pre-wrap;line-height:2;margin:4px 0">${esc(nt.text)}</p></div></div><button class="btn mtg" data-mtg="1" type="button">▾ نمایش کامل متن</button>`:''}
       ${!nt&&!fs.length?'<div class="empty">هنوز مطلبی برای این جلسه قرار داده نشده</div>':''}</div>
-      ${fs.length?`<div class="sr"><b>📎 فایل‌های ضمیمهٔ استاد</b><div class="mgrid">${fs.map(f=>`<button class="mc" data-m="${f.id}">${cover(f,520)}${isVid(f)?'<span class="stg-pl"><i>▶</i></span>':''}<span class="mcl">${esc(f.name)}</span></button>`).join('')}</div></div>`:''}`;}
+      ${fs.length?`<div class="sr"><b>📎 فایل‌های ضمیمهٔ استاد</b><div class="mgrid">${fs.map(f=>`<button class="mc" data-m="${f.id}">${cover(f,520)}${isVid(f)?'<span class="stg-pl"><i>▶</i></span>':''}<span class="mcl">${esc(f.name)}</span></button>`).join('')}</div></div>`:''}`;const bx=$('app').querySelector('.mtxt'),tg=$('app').querySelector('[data-mtg]');if(bx&&tg&&bx.scrollHeight<=bx.clientHeight+6)tg.remove();}
   async function click(e){
     const t=e.target,go=t.closest('[data-go]');
     if(go){tab=go.dataset.go;if(tab!=='home'){$('app').innerHTML='<div class="empty">⏳ در حال دریافت کارها…</div>';try{await refresh()}catch(x){}}view();return window.scrollTo(0,0);}
