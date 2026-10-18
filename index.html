@@ -433,7 +433,7 @@ body::after{width:42vw;height:42vw;left:-12vw;bottom:-18vw;background:#ec2f8c4d;
 <script>
 let N=12,FINAL=12;const setN=n=>{N=Math.max(1,Math.min(30,Math.round(+n)||12));FINAL=N};
 const API_KEY='';/* کلید Google Drive API ← پخش‌کنندهٔ بهتر (راهنما در پیام) */
-const API='https://script.google.com/macros/s/AKfycbzWxYcJDyZEF4U8F7S4udPkJog1GgyS_DFeg0jp_O_jA0RSboshIS9RdaifJyvlnevE/exec';/* ← آدرس Web app اپس‌اسکریپت را اینجا بگذارید تا دانشجوها فقط آدرس سایت را باز کنند */
+const API='https://script.google.com/macros/s/AKfycbyVNcydct06i5RHEisiPG-7zY9aqyIJvjGQkndyML5Es8IAOGmjBRMkuWW8iAufv-pU/exec';/* ← آدرس Web app اپس‌اسکریپت را اینجا بگذارید تا دانشجوها فقط آدرس سایت را باز کنند */
 const LV={1:['شروع خوب','🌱'],2:['خوب','🙂'],3:['بسیار خوب','😍'],4:['عالی','🔥'],5:['بی‌نظیر','🏆']};
 function burst(el){const r=el.getBoundingClientRect();for(let i=0;i<14;i++){const p=document.createElement('i'),a=Math.random()*6.28,d=30+Math.random()*50;p.className='pt';p.style.cssText=`left:${r.left+r.width/2}px;top:${r.top+r.height/2}px;background:${['#00b8d9','#ff2e88','#ffc928','#6c47ff'][i%4]};--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px`;document.body.appendChild(p);setTimeout(()=>p.remove(),700);}}
 const SEED=[{"num":"40411503101","name":"ادهم حدیث"},{"num":"40411503102","name":"اصغرنژاد عسل"},{"num":"40411503103","name":"افتخاری کرده ده روژینا"},{"num":"40411503104","name":"امیران بستان اباد زهرا"},{"num":"40411503105","name":"ایمانی اشنار سما"},{"num":"40411503106","name":"بایرامی حسنا"},{"num":"40411503108","name":"حسین پورمعتمد ساینا"},{"num":"40411503109","name":"رجبی لاسکی ستایش"},{"num":"40411503110","name":"عباسی جومیلو بیتا"},{"num":"40511503221","name":"عبداللهی مهدی"},{"num":"40411503111","name":"علی زاده مانیا"},{"num":"40411503112","name":"غفاری یایچی ایدا"},{"num":"40411503113","name":"معانی فاطمه"},{"num":"40411503114","name":"ملکی هلیا"},{"num":"40411503115","name":"منوری اسما"},{"num":"40411503117","name":"مهرپرور سیده معصومه"},{"num":"40411503118","name":"نیک منش مهدیه"},{"num":"40411503119","name":"هاتف هریس اسما"},{"num":"40411503120","name":"هریک دیزجی دینا"}];
@@ -537,9 +537,9 @@ const UP={e:null,n:1,i:0,nm:'',sz:1,t0:0,
  begin(n){this.n=n;window.onbeforeunload=()=>'آپلود در جریان است'},
  file(nm,i,sz){this.nm=nm;this.i=i;this.sz=sz||1;this.t0=Date.now();this.draw(0,'⏳ '+esc(nm),`فایل ${fa(i+1)} از ${fa(this.n)} · در حال آماده‌سازی…`)},
  prog(l){const p=l/this.sz*100,sp=l/Math.max(1,(Date.now()-this.t0)/1000);this.draw(p,'⬆️ '+esc(this.nm),`${mb(l)} از ${mb(this.sz)} · ${mb(sp)}/ث · فایل ${fa(this.i+1)} از ${fa(this.n)}`)},
- end(ok,msg){window.onbeforeunload=null;this.draw(ok?100:0,msg,'',ok?'ok':'er');setTimeout(()=>{if(this.e){this.e.remove();this.e=null}},ok?2500:8000)}};
+ end(ok,msg){window.onbeforeunload=null;this.draw(ok?100:0,msg,'',ok?'ok':'er');setTimeout(()=>{if(this.e){this.e.remove();this.e=null}},ok?2500:25000);if(!ok&&this.e)this.e.onclick=()=>{this.e.remove();this.e=null}}};
 async function uploadFile(u,base,f,kind,ses,i,extra){
-  if(f.size>209715200)throw new Error('حجم فایل بیشتر از ۲۰۰ مگابایت است');
+  if(f.size>524288000)throw new Error('حجم فایل '+mb(f.size)+' است و از ۵۰۰ مگابایت بیشتر است؛ ویدئو را با کیفیت ۷۲۰p ضبط یا فشرده کن');
   UP.file(f.name,i||0,f.size);
   const mime=f.type||'application/octet-stream',r0=await postR(u,{...base,a:'init',s:ses,kind,name:f.name,mime,size:f.size});if(r0.err)throw new Error(r0.err);let last={};
   for(let o=0;o<f.size;){const e=Math.min(o+1572864,f.size),r=await postR(u,{...base,...(extra||{}),a:'chunk',s:ses,kind,name:f.name,mime,uri:r0.uri,start:o,total:f.size,data:await b64(f.slice(o,e))});
@@ -549,14 +549,14 @@ async function uploadFile(u,base,f,kind,ses,i,extra){
 /* ================= حالت دانشجو ================= */
 function student(){
   document.body.className='stu';
-  const u=Q.get('u')||cfg.get('url','')||API,LOCK=+Q.get('c')||0;
+  const u=API||Q.get('u')||cfg.get('url',''),LOCK=+Q.get('c')||0;
   const norm=t=>String(t||'').replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).trim();
   let D=null,tab='home',cs=+cfg.get('ses','1')||1,rs=LOCK||cs,ms=cs,sc={},seen={};
   FL=()=>D?D.files:[];
   try{seen=JSON.parse(cfg.get('seen','{}'))}catch(e){}
   const shell=b=>{document.body.innerHTML=`<div class="sw" id="app">${b}</div><div class="modal" id="pm"><div class="box" id="pb"></div></div><div id="toast"></div>`;
     $('pm').onclick=e=>{if(e.target.id==='pm'){$('pm').classList.remove('on');$('pb').innerHTML='';}};
-    $('app').onclick=click;$('app').onchange=change;$('pm').addEventListener('click',click);$('pm').addEventListener('change',change);};
+    $('app').onclick=click;$('app').onchange=change;$('pm').addEventListener('click',click);$('pm').addEventListener('change',change);const vd=document.createElement('div');vd.id='ver';vd.style.cssText='text-align:center;opacity:.6;font-size:11px;padding:10px';vd.textContent='برنامه '+fa(11);document.body.appendChild(vd);try{fetch(u).then(r=>r.json()).then(j=>{vd.textContent='برنامه '+fa(11)+' · سرور '+fa(j.v)+' · …'+u.split('/s/')[1].split('/')[0].slice(-4)}).catch(()=>{vd.textContent+=' · سرور بدون پاسخ'})}catch(e){}};
   const login=msg=>{shell(`<div class="hero"><span class="lg">${LOGO.replace(/36/g,'72')}</span><h1 style="margin:8px 0 2px">کارگاه گرافیک و تبلیغات</h1><small class="lb">دانشگاه محقق اردبیل · ترم سه · استاد علی حسین عباس‌زاده</small></div>
     <div class="sr"><b>🔐 ورود با شماره دانشجویی</b><input id="num" class="t" inputmode="numeric" autocomplete="off" placeholder="شماره دانشجویی" value="${esc(cfg.get('num',''))}"><button class="btn pri big" id="go">ورود به صفحه من ✨</button><div class="lb" style="color:var(--danger)">${msg||''}</div></div><a class="tlink" href="?t=1">🎓 ورود استاد</a>`);
     const go=()=>enter($('num').value);$('go').onclick=go;$('num').onkeydown=e=>{if(e.key==='Enter')go()};};
@@ -564,7 +564,7 @@ function student(){
   async function refresh(){const r=await post(u,{a:'student',num:D.num});if(!r.err){if(r.n)setN(r.n);D={...r,num:D.num};loadSc();}}
   async function enter(n){n=norm(n);if(!u)return login('آدرس سرور تنظیم نشده؛ به استاد اطلاع بدهید');
     shell('<div class="empty">در حال ورود…</div>');
-    try{const r=await post(u,{a:'student',num:n});if(r.err)return login(r.err);cfg.set('num',n);if(r.n)setN(r.n);D={...r,num:n};loadSc();tab='home';view();}catch(e){login('اتصال برقرار نشد؛ اینترنت را بررسی کنید')}}
+    try{const r=await post(u,{a:'student',num:n});if(r.err)return login(r.err);cfg.set('num',n);if(r.n)setN(r.n);D={...r,num:n};loadSc();tab='home';view();if(!r.n)setTimeout(()=>toast('⚠️ نسخهٔ سرور قدیمی است؛ به استاد بگو Code.gs را دوباره Deploy کند'),900);}catch(e){login('اتصال برقرار نشد؛ اینترنت را بررسی کنید')}}
   const mine=(k,s)=>D.files.filter(f=>f.num===D.num&&f.s===s&&f.kind===k);
   const dn=()=>{const o={};for(let s=1;s<=N;s++)o[s]=D.done.includes(s);return o};
   const chips=(cur,f,g)=>`<div class="chips" id="cc">${Array.from({length:N},(_,i)=>i+1).map(s=>`<button data-s="${s}" class="${s===cur?'on':''} ${f(s)?'d':''} ${g&&g(s)?'n':''}">${fa(s)}</button>`).join('')}</div>`;
@@ -589,8 +589,8 @@ function student(){
     $('app').innerHTML=`${top('📁 تکلیف من')}${chips(cs,s=>D.done.includes(s),s=>(D.tnotes||[]).some(x=>x.s===s&&x.text))}
       ${tn?`<div class="sr tnote"><b>📝 یادداشت استاد برای ${sname(cs)}</b><p>${esc(tn.text)}</p><small class="lb">اگر نیاز به اصلاح دارد، کار اصلاح‌شده را دوباره آپلود کن.</small></div>`:''}
       <div class="sr"><b>${sname(cs)}</b>
-      ${md.length?stage(md,{del:true})+`<label class="btn upl">➕ افزودن ویدئو / فریم دیگر<input type="file" id="fm" accept="image/*,video/*" multiple hidden></label>`
-        :`<label class="stg emp upz"><span class="fl">🎬</span><b>ویدئو یا فریم این جلسه را اینجا آپلود کن</b><small>ضربه بزن؛ از گالری یا دوربین انتخاب کن</small><input type="file" id="fm" accept="image/*,video/*" multiple hidden></label>`}
+      ${md.length?stage(md,{del:true})+`<div class="rec"><label class="btn pri upl">🎬 افزودن ویدئو<input type="file" id="fmv" accept="video/*" hidden></label><label class="btn upl">🖼️ تصویر / فریم<input type="file" id="fm" accept="image/*" multiple hidden></label></div>`
+        :`<label class="stg emp upz"><span class="fl">🎬</span><b>ویدئوی این جلسه را اینجا آپلود کن</b><small>ضربه بزن؛ ویدئو را از گالری یا دوربین انتخاب کن (تا ۵۰۰ مگابایت)</small><input type="file" id="fmv" accept="video/*" hidden></label><label class="btn upl">🖼️ یا تصویر / فریم<input type="file" id="fm" accept="image/*" multiple hidden></label>`}
       <div class="pg" id="pg" hidden><i></i></div></div>
       <button class="big3" data-idea="1" style="--a:#f59e0b;--b:#ec2f8c"><span class="ic">💡</span><b>ثبت ایده برای این جلسه</b><small>${has?'✓ ثبت شده · برای ویرایش بزن':'بنویس یا فایل PDF / DOC بده'}</small></button>
       <div class="sr"><b>✅ جلسات تکمیل‌شده</b>${chart(dn())}<small class="lb">وقتی استاد جلسه را تأیید کند تیک می‌خورد</small></div>`;}
@@ -680,9 +680,9 @@ function student(){
   async function change(e){
     const id=e.target.id;
     if(id==='fav1'||id==='fav2'){const f=e.target.files[0];if(!f)return;UP.begin(1);
-      try{const b=await squareJpeg(f);await uploadFile(u,{num:D.num},new File([b],'avatar.jpg',{type:'image/jpeg'}),'avatar',0,0);UP.end(true,'عکس پروفایل ذخیره شد ✨');burst(document.body);await refresh();$('pm').classList.remove('on');$('pb').innerHTML='';view();}
+      try{let b;try{b=await squareJpeg(f)}catch(x){if(/^image\/(jpeg|png|webp)$/.test(f.type)&&f.size<8e6)b=f;else throw new Error('این فرمت عکس (مثلاً HEIC) خوانده نشد؛ در تنظیمات دوربین فرمت JPEG/«سازگارترین» را بگذار')}await uploadFile(u,{num:D.num},new File([b],'avatar.jpg',{type:b.type||'image/jpeg'}),'avatar',0,0);UP.end(true,'عکس پروفایل ذخیره شد ✨');burst(document.body);await refresh();$('pm').classList.remove('on');$('pb').innerHTML='';view();}
       catch(err){UP.end(false,'ناموفق: '+err.message)}return;}
-    if(id!=='fm'&&id!=='fi')return;const k=id==='fm'?'media':'idea',fs=[...e.target.files];if(!fs.length)return;
+    if(id!=='fm'&&id!=='fmv'&&id!=='fi')return;const k=id==='fi'?'idea':'media',fs=[...e.target.files];if(!fs.length)return;
     UP.begin(fs.length);
     try{for(let i=0;i<fs.length;i++)await uploadWithPoster(u,{num:D.num},fs[i],k,cs,i);UP.end(true,'آپلود کامل شد 🎉');burst(document.body);await refresh();if($('fi'))ideaModal();view();}
     catch(err){UP.end(false,'آپلود ناموفق: '+err.message)}}
@@ -731,7 +731,7 @@ const allM=()=>Object.values(mediaByKey).flat();
 function openM(id){const m=srv.files.find(x=>x.id===id);if(!m)return;
   $('pb').innerHTML=mFull(m)+`<div style="text-align:center;margin-top:8px;color:var(--mute)">${esc(m.name)} · <a href="${DR.view(m.id)}" target="_blank">باز کردن در Drive</a></div>`;$('pm').classList.add('on');}
 const pushNotes=u=>{const l=[];students.forEach(st=>sessions().forEach(s=>{const r=recs[key(st.id,s)];if(r&&r.note)l.push({num:st.num,s,text:r.note})}));if(l.length)post(u,{a:'note',key:cfg.get('key',''),list:l}).catch(()=>{})};
-const pushRoster=()=>{const u=(cfg.get('url','')||API),k=cfg.get('key','');if(u&&k)post(u,{a:'roster',key:k,list:students.map(s=>({num:s.num,name:s.name}))}).catch(()=>{});};
+const pushRoster=()=>{const u=(API||cfg.get('url','')),k=cfg.get('key','');if(u&&k)post(u,{a:'roster',key:k,list:students.map(s=>({num:s.num,name:s.name}))}).catch(()=>{});};
 
 function renderList(){
   const q=filter.trim();
@@ -827,7 +827,7 @@ $('view').addEventListener('click',async e=>{
   if(e.target.id==='bPlay'){const l=galList();return l.length?viewer(l,0):toast('کاری برای نمایش نیست');}
   const tl=e.target.closest('.gt3');
   if(tl){if(tl.dataset.m){const l=galList();viewer(l,Math.max(0,l.findIndex(x=>x.m.id===tl.dataset.m)));}else{cur=+tl.dataset.id;setTab('stu');render();}return;}
-  if(e.target.id==='bLink'){const h=cfg.get('host',''),u=(cfg.get('url','')||API);if(!h||!u){toast('ابتدا آدرس اتصال و میزبانی را در ⚙️ وارد کنید');return settings();}return copy(h.split('?')[0]+'?s=1&c='+gs+'&u='+encodeURIComponent(u));}
+  if(e.target.id==='bLink'){const h=cfg.get('host',''),u=(API||cfg.get('url',''));if(!h||!u){toast('ابتدا آدرس اتصال و میزبانی را در ⚙️ وارد کنید');return settings();}return copy(h.split('?')[0]+'?s=1&c='+gs+'&u='+encodeURIComponent(u));}
   if(e.target.id==='bEd')return editStudent(cur);
   if(e.target.id==='bDel'){const s=students.find(x=>x.id===cur);
     if(!confirm('حذف «'+s.name+'» و همه اطلاعات و فایل‌هایش؟'))return;
@@ -849,10 +849,10 @@ $('view').addEventListener('change',async e=>{
   if(e.target.id==='mf'){const fs=[...e.target.files];if(fs.length)upMat(fs);return;}
   const cd=e.target.closest('.card');if(!cd)return;const s=+cd.dataset.s;
   if(e.target.classList.contains('dn')){const r=rec(cur,s);r.done=e.target.checked;await saveRec(r);
-    const st=students.find(x=>x.id===cur),u=(cfg.get('url','')||API);
+    const st=students.find(x=>x.id===cur),u=(API||cfg.get('url',''));
     if(u)post(u,{a:'done',key:cfg.get('key',''),num:st.num,s,done:r.done}).then(x=>{if(x.err)toast(x.err)}).catch(()=>toast('ثبت روی سرور ناموفق بود'));
     renderStudent();renderList();}
-  if(e.target.classList.contains('note')){const r=rec(cur,s);r.note=e.target.value;await saveRec(r);const st=students.find(x=>x.id===cur),nu=(cfg.get('url','')||API);
+  if(e.target.classList.contains('note')){const r=rec(cur,s);r.note=e.target.value;await saveRec(r);const st=students.find(x=>x.id===cur),nu=(API||cfg.get('url',''));
     if(nu)post(nu,{a:'note',key:cfg.get('key',''),list:[{num:st.num,s,text:r.note}]}).then(x=>x.err?toast(x.err):toast('یادداشت برای دانشجو ثبت شد ✓')).catch(()=>toast('ثبت یادداشت روی سرور ناموفق بود'));}
 });
 $('pm').onclick=e=>{if(e.target.id==='pm'){$('pm').classList.remove('on');$('pb').innerHTML='';}};
@@ -876,7 +876,7 @@ $('bAdd').onclick=()=>editStudent(null);
 
 /* ---- sync & settings ---- */
 async function sync(q){
-  const u=(cfg.get('url','')||API);if(!u){if(q)return;toast('ابتدا آدرس اتصال را در ⚙️ تنظیمات وارد کنید');return settings();}
+  const u=(API||cfg.get('url',''));if(!u){if(q)return;toast('ابتدا آدرس اتصال را در ⚙️ تنظیمات وارد کنید');return settings();}
   if(!q)toast('در حال دریافت اطلاعات…');
   if(!sync.r){sync.r=1;pushRoster();pushNotes(u);}
   try{const a=await post(u,{a:'all',key:cfg.get('key','')});if(a.err){if(/کلید/.test(a.err)){cfg.set('key','');location.replace(location.pathname+'?t=1');return}if(!q)toast(a.err);return;}
@@ -894,7 +894,7 @@ async function sync(q){
 function settings(){
   $('ff').innerHTML=`<h3 style="margin:0">⚙️ اتصال و تنظیمات</h3>
     <small><b>راه‌اندازی:</b> کد فایل <b>Code.gs</b> را در Apps Script بگذارید و Deploy کنید؛ سپس آدرس Web app و «کلید معلم» (همان TEACHER_KEY) را اینجا وارد کنید. فایل‌ها در پوشهٔ <b>ClassTracker</b> در Google Drive ذخیره می‌شوند.</small>
-    <input id="su" placeholder="آدرس Web app (https://script.google.com/macros/s/…/exec)" style="direction:ltr" value="${esc((cfg.get('url','')||API))}">
+    <input id="su" placeholder="آدرس Web app (https://script.google.com/macros/s/…/exec)" style="direction:ltr" value="${esc((API||cfg.get('url','')))}">
     <input id="sk" placeholder="کلید معلم (TEACHER_KEY)" style="direction:ltr" value="${esc(cfg.get('key',''))}">
     <label>وزن رأی همکلاسی‌ها در امتیاز نهایی: <b id="wv">${fa(W()*100)}</b>٪ (بقیه = امتیاز استاد)<input type="range" id="sw" min="0" max="100" step="10" value="${W()*100}"></label>
     <label class="snx">تعداد جلسات: <button class="btn" id="nm" type="button">−</button><input id="sn" type="number" min="1" max="30" value="${N}"><button class="btn" id="np" type="button">＋</button><small>آخرین جلسه = ژوری و تحویل نهایی. کم‌کردن، اطلاعات را پاک نمی‌کند.</small></label>
@@ -907,9 +907,9 @@ function settings(){
   
   $('fc').onclick=()=>$('fmod').classList.remove('on');
   $('ss').onclick=()=>{save();$('fmod').classList.remove('on');sync.r=0;render();sync();toast('ذخیره شد ✓');};
-  $('cl').onclick=()=>{save();const h=cfg.get('host','');if(!h||!(cfg.get('url','')||API))return toast('آدرس اتصال و آدرس میزبانی را وارد کنید');copy(h.split('?')[0]+'?s=1&u='+encodeURIComponent((cfg.get('url','')||API)));};
+  $('cl').onclick=()=>{save();const h=cfg.get('host','');if(!h||!(API||cfg.get('url','')))return toast('آدرس اتصال و آدرس میزبانی را وارد کنید');copy(h.split('?')[0]+'?s=1&u='+encodeURIComponent((API||cfg.get('url',''))));};
 }
-const matCfg=()=>({u:(cfg.get('url','')||API),k:cfg.get('key','')});
+const matCfg=()=>({u:(API||cfg.get('url','')),k:cfg.get('key','')});
 async function upMat(fs){const{u,k}=matCfg();UP.begin(fs.length);
   try{for(let i=0;i<fs.length;i++)await uploadWithPoster(u,{num:'teacher',key:k},fs[i],'material',msx,i);UP.end(true,'آپلود کامل شد 🎉');burst(document.body);}catch(x){UP.end(false,'آپلود ناموفق: '+x.message)}
   await sync(true);render();}
@@ -988,7 +988,7 @@ function tLogin(msg){document.body.className='stu';
       cfg.set('url',url);cfg.set('key',key);location.replace(location.pathname+'?t=1');}
     catch(e){$('tg').disabled=false;te.textContent=e.message||'اتصال برقرار نشد'}};
   $('tg').onclick=go;$('tk').onkeydown=e=>{if(e.key==='Enter')go()};}
-if(Q.has('t'))((cfg.get('key','')&&(cfg.get('url','')||API))?teacher:tLogin)();
+if(Q.has('t'))((cfg.get('key','')&&(API||cfg.get('url','')))?teacher:tLogin)();
 else if(Q.has('s')||cfg.get('num',''))student();
 else landing();
 </script>
