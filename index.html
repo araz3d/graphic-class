@@ -384,6 +384,64 @@ body::after{width:42vw;height:42vw;left:-12vw;bottom:-18vw;background:#ec2f8c4d;
 .mwrap .sr{align-self:start}
 .mwrap .stg.emp{aspect-ratio:auto;min-height:190px}
 .gh .sub .chip{margin-inline-end:6px}
+
+/* v7: fullscreen, crop title, audio, sessions */
+.pw .fx{display:none;position:absolute;top:10px;right:10px;z-index:5;width:46px;height:46px;border-radius:50%;border:0;background:#000b;color:#fff;font-size:22px;place-items:center;cursor:pointer}
+.pw:fullscreen .fx,.pw:-webkit-full-screen .fx,.pw.fsx .fx{display:grid}
+.pw:fullscreen,.pw:-webkit-full-screen{aspect-ratio:auto;width:100%!important;height:100%;border-radius:0;margin:0}
+.pw.fsx{position:fixed;inset:0;width:100vw!important;height:100dvh;aspect-ratio:auto;border-radius:0;margin:0;z-index:9999}
+.pw.cr iframe{inset:auto;top:-56px;left:0;width:100%;height:calc(100% + 56px)}
+.pw video{object-fit:contain;background:#000}
+.rec{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;width:100%}
+.rec .dot{width:12px;height:12px;border-radius:50%;background:#e5484d;animation:pls 1s infinite}.rec audio{width:100%}
+.snx{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.snx input{width:70px;text-align:center}
+.mtxt{max-height:156px;transition:max-height .35s;overflow-y:auto;overscroll-behavior:contain;margin:6px 0 2px;padding:4px 12px;border-radius:14px;background:color-mix(in srgb,var(--card) 60%,transparent);border:1px solid #ffffff14;scrollbar-width:thin;scrollbar-color:#a855f7 transparent}
+.mtxt::-webkit-scrollbar{width:8px}.mtxt::-webkit-scrollbar-thumb{background:linear-gradient(#6c47ff,#ec2f8c);border-radius:8px}.mtxt::-webkit-scrollbar-track{background:#ffffff0d;border-radius:8px}
+.mtxt.open{max-height:68vh}
+.mtw{position:relative}.mtw:not(.o)::after{content:'';position:absolute;left:0;right:0;bottom:0;height:38px;border-radius:0 0 14px 14px;background:linear-gradient(transparent,var(--card));pointer-events:none}
+.mtg{display:block;margin:8px auto 0}
+/* ===== اسکرول‌بار هماهنگ با طراحی ===== */
+:root{color-scheme:light}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark}}
+*{scrollbar-width:thin;scrollbar-color:#8f74ffcc transparent}
+@supports selector(::-webkit-scrollbar){
+  *{scrollbar-width:auto;scrollbar-color:auto}
+  ::-webkit-scrollbar{width:12px;height:12px}
+  ::-webkit-scrollbar-track{background:transparent;margin:6px}
+  ::-webkit-scrollbar-thumb{min-height:44px;min-width:44px;border-radius:99px;border:4px solid transparent;background-clip:padding-box;
+    background-image:linear-gradient(180deg,#00b8d9,#6c47ff 55%,#ec2f8c)}
+  ::-webkit-scrollbar-thumb:horizontal{background-image:linear-gradient(90deg,#00b8d9,#6c47ff 55%,#ec2f8c)}
+  ::-webkit-scrollbar-thumb:hover{border-width:2px;background-image:linear-gradient(180deg,#22d3ee,#8f74ff 55%,#ff4fa3)}
+  ::-webkit-scrollbar-thumb:horizontal:hover{background-image:linear-gradient(90deg,#22d3ee,#8f74ff 55%,#ff4fa3)}
+  ::-webkit-scrollbar-thumb:active{border-width:1px}
+  ::-webkit-scrollbar-corner{background:transparent}
+}
+textarea{scrollbar-gutter:auto}
+/* نوار پیشرفت اسکرول زیر هدر */
+header::after{content:"";position:absolute;right:0;bottom:0;height:3px;width:calc(var(--sp,0)*100%);background:linear-gradient(270deg,#00b8d9,#6c47ff,#ec2f8c,#ffc928);box-shadow:0 0 12px #ec2f8c;border-radius:3px 0 0 3px;transition:width .12s linear;pointer-events:none}
+/* ===== چیدمان تصاویر ایده: هم‌عرض متن، شبکه‌ای و وسط‌چین ===== */
+.idea{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px;align-items:start}
+.idea>b,.idea>p,.idea>small{grid-column:1/-1;margin:0}
+.idea>.btn{display:block!important;padding:0;border:0;background:none;box-shadow:none}
+.idea>.btn:hover{transform:none;box-shadow:none}
+.idea>.btn a[data-img]{display:block!important;width:100%}
+.idea>.btn a[data-img] img{width:100%!important;height:auto!important;aspect-ratio:1;border-radius:14px!important;transition:transform .3s,box-shadow .3s}
+.idea>.btn a[data-img]:hover img{transform:scale(1.04);box-shadow:0 12px 24px -10px #6c47ff99}
+.idea>.btn:has(audio),.idea>.btn:has(a:not([data-img])){grid-column:1/-1;padding:7px 12px;border:1px solid var(--line);background:var(--card);border-radius:10px}
+.fm .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;justify-items:center}
+.fm .thumbs>.btn{display:flex!important;justify-content:center;align-items:center;padding:6px}
+.fm .thumbs>.btn:has(audio),.fm .thumbs>.btn:has(a:not([data-img])){grid-column:1/-1;justify-self:stretch}
+
+/* ===== مطالب استاد (دانشجو): پیش‌نمایش چندخطی + ادامهٔ مطلب ===== */
+.mtxt{max-height:150px;overflow-y:hidden;touch-action:pan-y;padding:6px 14px;border:1px solid var(--line);background:color-mix(in srgb,var(--bg) 70%,transparent);box-shadow:none;transition:max-height .45s cubic-bezier(.2,.8,.2,1)}
+.mtxt.open{max-height:62vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#8f74ffcc transparent}
+.mtxt::-webkit-scrollbar{width:12px}
+.mtxt::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#00b8d9,#6c47ff 55%,#ec2f8c);border:4px solid transparent;background-clip:padding-box;border-radius:99px;min-height:44px}
+.mtxt::-webkit-scrollbar-track{background:transparent;margin:8px 0}
+.mtw:not(.o)::after{height:64px;background:linear-gradient(transparent,var(--card) 85%);bottom:0}
+.mtg{display:flex;align-items:center;gap:8px;margin:10px auto 0;padding:9px 20px;border:0;border-radius:99px;color:#fff;font-weight:700;background:linear-gradient(120deg,#6c47ff,#ec2f8c);box-shadow:0 10px 22px -10px #6c47ffcc;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.mtg:hover{transform:translateY(-2px);box-shadow:0 14px 26px -10px #ec2f8ccc}
+.mtg:active{transform:scale(.97)}
 </style>
 </head>
 <body>
@@ -418,23 +476,7 @@ body::after{width:42vw;height:42vw;left:-12vw;bottom:-18vw;background:#ec2f8c4d;
 <div class="modal" id="fmod"><div class="box"><div class="fm" id="ff"></div></div></div>
 <div id="toast"></div>
 
-<style>
-/* v7: fullscreen, crop title, audio, sessions */
-.pw .fx{display:none;position:absolute;top:10px;right:10px;z-index:5;width:46px;height:46px;border-radius:50%;border:0;background:#000b;color:#fff;font-size:22px;place-items:center;cursor:pointer}
-.pw:fullscreen .fx,.pw:-webkit-full-screen .fx,.pw.fsx .fx{display:grid}
-.pw:fullscreen,.pw:-webkit-full-screen{aspect-ratio:auto;width:100%!important;height:100%;border-radius:0;margin:0}
-.pw.fsx{position:fixed;inset:0;width:100vw!important;height:100dvh;aspect-ratio:auto;border-radius:0;margin:0;z-index:9999}
-.pw.cr iframe{inset:auto;top:-56px;left:0;width:100%;height:calc(100% + 56px)}
-.pw video{object-fit:contain;background:#000}
-.rec{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;width:100%}
-.rec .dot{width:12px;height:12px;border-radius:50%;background:#e5484d;animation:pls 1s infinite}.rec audio{width:100%}
-.snx{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.snx input{width:70px;text-align:center}
-.mtxt{max-height:156px;transition:max-height .35s;overflow-y:auto;overscroll-behavior:contain;margin:6px 0 2px;padding:4px 12px;border-radius:14px;background:color-mix(in srgb,var(--card) 60%,transparent);border:1px solid #ffffff14;scrollbar-width:thin;scrollbar-color:#a855f7 transparent}
-.mtxt::-webkit-scrollbar{width:8px}.mtxt::-webkit-scrollbar-thumb{background:linear-gradient(#6c47ff,#ec2f8c);border-radius:8px}.mtxt::-webkit-scrollbar-track{background:#ffffff0d;border-radius:8px}
-.mtxt.open{max-height:68vh}
-.mtw{position:relative}.mtw:not(.o)::after{content:'';position:absolute;left:0;right:0;bottom:0;height:38px;border-radius:0 0 14px 14px;background:linear-gradient(transparent,var(--card));pointer-events:none}
-.mtg{display:block;margin:8px auto 0}
-</style>
+
 <script>
 let N=12,FINAL=12;const setN=n=>{N=Math.max(1,Math.min(30,Math.round(+n)||12));FINAL=N};
 const API_KEY='';/* کلید Google Drive API ← پخش‌کنندهٔ بهتر (راهنما در پیام) */
@@ -842,6 +884,7 @@ const setTab=t=>{tab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.
 
 /* ---- events ---- */
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{setTab(b.dataset.t);render();});
+{const sv=$('view');sv.addEventListener('scroll',()=>{const m=sv.scrollHeight-sv.clientHeight;document.body.style.setProperty('--sp',m>0?(sv.scrollTop/m).toFixed(4):0)},{passive:true});}
 $('q').oninput=e=>{filter=e.target.value;renderList();};
 $('list').onclick=e=>{const c=e.target.closest('.st');if(c){cur=+c.dataset.id;render();}};
 $('view').addEventListener('click',async e=>{
