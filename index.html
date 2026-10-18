@@ -429,6 +429,8 @@ body::after{width:42vw;height:42vw;left:-12vw;bottom:-18vw;background:#ec2f8c4d;
 .rec{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;width:100%}
 .rec .dot{width:12px;height:12px;border-radius:50%;background:#e5484d;animation:pls 1s infinite}.rec audio{width:100%}
 .snx{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.snx input{width:70px;text-align:center}
+.mtxt{max-height:56vh;overflow-y:auto;overscroll-behavior:contain;margin:6px 0 2px;padding:4px 12px;border-radius:14px;background:color-mix(in srgb,var(--card) 60%,transparent);border:1px solid #ffffff14;scrollbar-width:thin;scrollbar-color:#a855f7 transparent}
+.mtxt::-webkit-scrollbar{width:8px}.mtxt::-webkit-scrollbar-thumb{background:linear-gradient(#6c47ff,#ec2f8c);border-radius:8px}.mtxt::-webkit-scrollbar-track{background:#ffffff0d;border-radius:8px}
 </style>
 <script>
 let N=12,FINAL=12;const setN=n=>{N=Math.max(1,Math.min(30,Math.round(+n)||12));FINAL=N};
@@ -649,9 +651,9 @@ function student(){
   function mat(){
     const fs=MAT(ms),nt=(D.notes||[]).find(i=>i.s===ms&&i.text);
     $('app').innerHTML=`${top('📚 مطالب تدریس‌شده')}${chips(ms,s=>MAT(s).length||(D.notes||[]).some(i=>i.s===s&&i.text))}
-      <div class="sr"><b>${sname(ms)}</b>${nt?`<p style="white-space:pre-wrap;line-height:2;margin:4px 0">${esc(nt.text)}</p>`:''}
-      ${fs.length?`<div class="mgrid">${fs.map(f=>`<button class="mc" data-m="${f.id}">${cover(f,520)}${isVid(f)?'<span class="stg-pl"><i>▶</i></span>':''}<span class="mcl">${esc(f.name)}</span></button>`).join('')}</div>`:''}
-      ${!nt&&!fs.length?'<div class="empty">هنوز مطلبی برای این جلسه قرار داده نشده</div>':''}</div>`;}
+      <div class="sr"><b>${sname(ms)}</b>${nt?`<div class="mtxt"><p style="white-space:pre-wrap;line-height:2;margin:4px 0">${esc(nt.text)}</p></div>${nt.text.length>500?'<small class="lb">↕ برای خواندن ادامهٔ متن، داخل کادر بکشید</small>':''}`:''}
+      ${!nt&&!fs.length?'<div class="empty">هنوز مطلبی برای این جلسه قرار داده نشده</div>':''}</div>
+      ${fs.length?`<div class="sr"><b>📎 فایل‌های ضمیمهٔ استاد</b><div class="mgrid">${fs.map(f=>`<button class="mc" data-m="${f.id}">${cover(f,520)}${isVid(f)?'<span class="stg-pl"><i>▶</i></span>':''}<span class="mcl">${esc(f.name)}</span></button>`).join('')}</div></div>`:''}`;}
   async function click(e){
     const t=e.target,go=t.closest('[data-go]');
     if(go){tab=go.dataset.go;if(tab!=='home'){$('app').innerHTML='<div class="empty">⏳ در حال دریافت کارها…</div>';try{await refresh()}catch(x){}}view();return window.scrollTo(0,0);}
