@@ -537,9 +537,9 @@ const UP={e:null,n:1,i:0,nm:'',sz:1,t0:0,
  begin(n){this.n=n;window.onbeforeunload=()=>'آپلود در جریان است'},
  file(nm,i,sz){this.nm=nm;this.i=i;this.sz=sz||1;this.t0=Date.now();this.draw(0,'⏳ '+esc(nm),`فایل ${fa(i+1)} از ${fa(this.n)} · در حال آماده‌سازی…`)},
  prog(l){const p=l/this.sz*100,sp=l/Math.max(1,(Date.now()-this.t0)/1000);this.draw(p,'⬆️ '+esc(this.nm),`${mb(l)} از ${mb(this.sz)} · ${mb(sp)}/ث · فایل ${fa(this.i+1)} از ${fa(this.n)}`)},
- end(ok,msg){window.onbeforeunload=null;this.draw(ok?100:0,msg,'',ok?'ok':'er');setTimeout(()=>{if(this.e){this.e.remove();this.e=null}},ok?2500:8000)}};
+ end(ok,msg){window.onbeforeunload=null;this.draw(ok?100:0,msg,'',ok?'ok':'er');setTimeout(()=>{if(this.e){this.e.remove();this.e=null}},ok?2500:25000);if(!ok&&this.e)this.e.onclick=()=>{this.e.remove();this.e=null}}};
 async function uploadFile(u,base,f,kind,ses,i,extra){
-  if(f.size>209715200)throw new Error('حجم فایل بیشتر از ۲۰۰ مگابایت است');
+  if(f.size>524288000)throw new Error('حجم فایل '+mb(f.size)+' است و از ۵۰۰ مگابایت بیشتر است؛ ویدئو را با کیفیت ۷۲۰p ضبط یا فشرده کن');
   UP.file(f.name,i||0,f.size);
   const mime=f.type||'application/octet-stream',r0=await postR(u,{...base,a:'init',s:ses,kind,name:f.name,mime,size:f.size});if(r0.err)throw new Error(r0.err);let last={};
   for(let o=0;o<f.size;){const e=Math.min(o+1572864,f.size),r=await postR(u,{...base,...(extra||{}),a:'chunk',s:ses,kind,name:f.name,mime,uri:r0.uri,start:o,total:f.size,data:await b64(f.slice(o,e))});
@@ -589,8 +589,8 @@ function student(){
     $('app').innerHTML=`${top('📁 تکلیف من')}${chips(cs,s=>D.done.includes(s),s=>(D.tnotes||[]).some(x=>x.s===s&&x.text))}
       ${tn?`<div class="sr tnote"><b>📝 یادداشت استاد برای ${sname(cs)}</b><p>${esc(tn.text)}</p><small class="lb">اگر نیاز به اصلاح دارد، کار اصلاح‌شده را دوباره آپلود کن.</small></div>`:''}
       <div class="sr"><b>${sname(cs)}</b>
-      ${md.length?stage(md,{del:true})+`<label class="btn upl">➕ افزودن ویدئو / فریم دیگر<input type="file" id="fm" accept="image/*,video/*" multiple hidden></label>`
-        :`<label class="stg emp upz"><span class="fl">🎬</span><b>ویدئو یا فریم این جلسه را اینجا آپلود کن</b><small>ضربه بزن؛ از گالری یا دوربین انتخاب کن</small><input type="file" id="fm" accept="image/*,video/*" multiple hidden></label>`}
+      ${md.length?stage(md,{del:true})+`<div class="rec"><label class="btn pri upl">🎬 افزودن ویدئو<input type="file" id="fmv" accept="video/*" hidden></label><label class="btn upl">🖼️ تصویر / فریم<input type="file" id="fm" accept="image/*" multiple hidden></label></div>`
+        :`<label class="stg emp upz"><span class="fl">🎬</span><b>ویدئوی این جلسه را اینجا آپلود کن</b><small>ضربه بزن؛ ویدئو را از گالری یا دوربین انتخاب کن (تا ۵۰۰ مگابایت)</small><input type="file" id="fmv" accept="video/*" hidden></label><label class="btn upl">🖼️ یا تصویر / فریم<input type="file" id="fm" accept="image/*" multiple hidden></label>`}
       <div class="pg" id="pg" hidden><i></i></div></div>
       <button class="big3" data-idea="1" style="--a:#f59e0b;--b:#ec2f8c"><span class="ic">💡</span><b>ثبت ایده برای این جلسه</b><small>${has?'✓ ثبت شده · برای ویرایش بزن':'بنویس یا فایل PDF / DOC بده'}</small></button>
       <div class="sr"><b>✅ جلسات تکمیل‌شده</b>${chart(dn())}<small class="lb">وقتی استاد جلسه را تأیید کند تیک می‌خورد</small></div>`;}
@@ -680,9 +680,9 @@ function student(){
   async function change(e){
     const id=e.target.id;
     if(id==='fav1'||id==='fav2'){const f=e.target.files[0];if(!f)return;UP.begin(1);
-      try{const b=await squareJpeg(f);await uploadFile(u,{num:D.num},new File([b],'avatar.jpg',{type:'image/jpeg'}),'avatar',0,0);UP.end(true,'عکس پروفایل ذخیره شد ✨');burst(document.body);await refresh();$('pm').classList.remove('on');$('pb').innerHTML='';view();}
+      try{let b;try{b=await squareJpeg(f)}catch(x){if(/^image\/(jpeg|png|webp)$/.test(f.type)&&f.size<8e6)b=f;else throw new Error('این فرمت عکس (مثلاً HEIC) خوانده نشد؛ در تنظیمات دوربین فرمت JPEG/«سازگارترین» را بگذار')}await uploadFile(u,{num:D.num},new File([b],'avatar.jpg',{type:b.type||'image/jpeg'}),'avatar',0,0);UP.end(true,'عکس پروفایل ذخیره شد ✨');burst(document.body);await refresh();$('pm').classList.remove('on');$('pb').innerHTML='';view();}
       catch(err){UP.end(false,'ناموفق: '+err.message)}return;}
-    if(id!=='fm'&&id!=='fi')return;const k=id==='fm'?'media':'idea',fs=[...e.target.files];if(!fs.length)return;
+    if(id!=='fm'&&id!=='fmv'&&id!=='fi')return;const k=id==='fi'?'idea':'media',fs=[...e.target.files];if(!fs.length)return;
     UP.begin(fs.length);
     try{for(let i=0;i<fs.length;i++)await uploadWithPoster(u,{num:D.num},fs[i],k,cs,i);UP.end(true,'آپلود کامل شد 🎉');burst(document.body);await refresh();if($('fi'))ideaModal();view();}
     catch(err){UP.end(false,'آپلود ناموفق: '+err.message)}}
