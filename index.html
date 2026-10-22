@@ -442,6 +442,25 @@ header::after{content:"";position:absolute;right:0;bottom:0;height:3px;width:cal
 .mtg{display:flex;align-items:center;gap:8px;margin:10px auto 0;padding:9px 20px;border:0;border-radius:99px;color:#fff;font-weight:700;background:linear-gradient(120deg,#6c47ff,#ec2f8c);box-shadow:0 10px 22px -10px #6c47ffcc;cursor:pointer;transition:transform .2s,box-shadow .2s}
 .mtg:hover{transform:translateY(-2px);box-shadow:0 14px 26px -10px #ec2f8ccc}
 .mtg:active{transform:scale(.97)}
+/* ===== v11 · پرامپت ویدئو و ساخت ویدئو ===== */
+.vbx{border-top:4px solid #06a8c9}
+.vbx h4{margin:2px 0 0;font-size:15px}
+.vpc{border:1px solid var(--line);border-radius:16px;padding:12px;background:var(--bg);display:flex;flex-direction:column;gap:8px}
+.vph{display:flex;align-items:center;gap:10px}.vph img{width:64px;height:40px;object-fit:cover;border-radius:8px}
+.vph b{flex:1}
+.vpt{white-space:pre-wrap;line-height:1.9;font-size:13.5px;padding:8px 10px;border-radius:10px;background:var(--card);border:1px solid var(--line)}
+.vpt.en{direction:ltr;text-align:left;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.7}
+.vpr{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.vpr .btn{font-size:13px;padding:6px 10px}
+.vfl{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.vfl a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border-radius:14px;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);font-weight:700;transition:.2s}
+.vfl a:hover{border-color:var(--brand);transform:translateY(-2px)}.vfl a small{color:var(--mute);font-weight:400;font-size:11px}
+.vst{font-size:12.5px;font-weight:700;color:var(--brand)}
+a[data-vplay]{position:relative;display:inline-block}
+a[data-vplay] img{width:128px;height:128px;object-fit:cover;border-radius:12px;display:block;background:#000}
+a[data-vplay] .pl{font-size:26px}
+.idea>.btn a[data-vplay]{display:block!important;width:100%}
+.idea>.btn a[data-vplay] img{width:100%!important;height:auto!important;aspect-ratio:1;border-radius:14px!important}
+.idea>.btn:has(a[data-vplay]),.fm .thumbs>.btn:has(a[data-vplay]){grid-column:auto!important;justify-self:auto!important}
 </style>
 </head>
 <body>
@@ -522,7 +541,12 @@ const PXPH=m=>`<div class="pw" style="background:#000 center/contain no-repeat u
 const pwHtml=m=>cfg.get('px','')==='1'&&isVid(m)?PXPH(m):API_KEY&&isVid(m)?`<div class="pw"><video controls playsinline preload="metadata" poster="${DR.th(m.id,1280)}" src="https://www.googleapis.com/drive/v3/files/${m.id}?alt=media&key=${API_KEY}" onerror="this.parentNode.classList.add('cr');this.outerHTML=IFR('${m.id}')"></video><button class="fx">✕</button></div>`:`<div class="pw cr">${IFR(m.id)}<button class="fx">✕</button></div>`;
 const AUD=f=>/^audio/.test(f.mime||'');
 const audPx=f=>`<a class="aud" href="${DR.view(f.id)}" target="_blank" data-apx="${f.id}" data-mime="${esc(f.mime||'')}" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:99px;color:#fff;text-decoration:none;font-weight:700;background:linear-gradient(120deg,#6c47ff,#ec2f8c);box-shadow:0 8px 18px -10px #6c47ffcc"><span style="font-size:16px">▶</span> 🎙️ پخش صدا</a>`;
-const idLink=f=>isImg(f)?`<a href="${DR.view(f.id)}" data-img="${f.id}" style="position:relative;display:inline-block;cursor:zoom-in"><img src="${DR.th(f.id,360)}" alt="" style="width:128px;height:128px;object-fit:cover;border-radius:12px;display:block">${/^AI-/.test(f.name)?'<i style="position:absolute;top:4px;left:4px;background:#6c47ff;color:#fff;border-radius:99px;padding:0 7px;font-size:10px;font-style:normal;font-weight:800">AI</i>':''}</a>`:AUD(f)&&API_KEY?`<audio controls preload="none" src="https://www.googleapis.com/drive/v3/files/${f.id}?alt=media&key=${API_KEY}" style="height:38px;max-width:100%"></audio>`:AUD(f)?audPx(f):`<a href="${DR.view(f.id)}" target="_blank">📄 ${esc(f.name)}</a>`;
+const vidLink=f=>`<a href="${DR.view(f.id)}" data-vplay="${esc(f.id)}" title="${esc(f.name)}"><img src="${DR.th(f.poster||f.id,360)}" alt="" onerror="this.style.visibility='hidden'"><span class="pl">▶</span>${/^AIV-/.test(f.name)?'<i style="position:absolute;top:4px;left:4px;background:#06a8c9;color:#fff;border-radius:99px;padding:0 7px;font-size:10px;font-style:normal;font-weight:800">AI 🎬</i>':''}</a>`;
+document.addEventListener('click',e=>{const a=e.target.closest('[data-vplay]');if(!a||e.ctrlKey||e.metaKey)return;e.preventDefault();e.stopPropagation();
+  const id=a.dataset.vplay,o=document.createElement('div');o.id='lbx';o.style.cssText='position:fixed;inset:0;z-index:10000;background:#000e;display:grid;place-items:center;padding:12px';
+  o.innerHTML=`<div style="width:min(94vw,960px)"><div class="pw cr">${IFR(id)}</div><div class="pbar" style="justify-content:center"><a class="btn" style="background:#fff2;color:#fff;border-color:#fff4" target="_blank" href="${DR.view(id)}">↗ باز کردن در Drive</a><a class="btn" style="background:#fff2;color:#fff;border-color:#fff4" target="_blank" href="https://drive.google.com/uc?export=download&id=${id}">⬇ دانلود</a></div><small style="display:block;text-align:center;color:#fffa;margin-top:6px">اگر ویدئو تازه ساخته شده، ممکن است Drive یکی دو دقیقه برای آماده‌سازی پخش وقت بخواهد.</small></div><button data-x="1" style="position:absolute;top:14px;right:14px;width:46px;height:46px;border-radius:50%;border:0;background:#fff3;color:#fff;font-size:22px;cursor:pointer" aria-label="بستن">✕</button>`;
+  o.onclick=ev=>{if(ev.target===o||ev.target.closest('[data-x]'))o.remove()};document.body.appendChild(o);},true);
+const idLink=f=>isVid(f)?vidLink(f):isImg(f)?`<a href="${DR.view(f.id)}" data-img="${f.id}" style="position:relative;display:inline-block;cursor:zoom-in"><img src="${DR.th(f.id,360)}" alt="" style="width:128px;height:128px;object-fit:cover;border-radius:12px;display:block">${/^AI-/.test(f.name)?'<i style="position:absolute;top:4px;left:4px;background:#6c47ff;color:#fff;border-radius:99px;padding:0 7px;font-size:10px;font-style:normal;font-weight:800">AI</i>':''}</a>`:AUD(f)&&API_KEY?`<audio controls preload="none" src="https://www.googleapis.com/drive/v3/files/${f.id}?alt=media&key=${API_KEY}" style="height:38px;max-width:100%"></audio>`:AUD(f)?audPx(f):`<a href="${DR.view(f.id)}" target="_blank">📄 ${esc(f.name)}</a>`;
 const mFull=m=>isImg(m)?`<img src="${DR.th(m.id,1600)}" onerror="this.onerror=null;this.src='https://drive.google.com/uc?export=view&id=${m.id}'"><div class="pbar"><a class="btn" target="_blank" href="${DR.view(m.id)}">↗ باز کردن در Drive</a></div>`:
  `${pwHtml(m)}<div class="pbar"><button class="btn" data-fs="${m.id}">⛶ تمام‌صفحه</button><a class="btn" target="_blank" href="${DR.view(m.id)}">↗ Drive</a>${isVid(m)?PXB(m,'🔁 پخش جایگزین'):''}</div>`;
 document.addEventListener('click',e=>{const f=e.target.closest('[data-fs]'),a=e.target.closest('[data-alt]');
@@ -676,7 +700,7 @@ function student(){
   async function refresh(){const r=await post(u,{a:'student',num:D.num});if(!r.err){if(r.n)setN(r.n);D=svIn({...r,files:cleanF(r.files),num:D.num});loadSc();}}
   async function enter(n){n=norm(n);if(!u)return login('آدرس سرور تنظیم نشده؛ به استاد اطلاع بدهید');
     shell('<div class="empty">در حال ورود…</div>');
-    try{const r=await post(u,{a:'student',num:n});if(r.err)return login(r.err);cfg.set('num',n);if(r.n)setN(r.n);D=svIn({...r,files:cleanF(r.files),num:n});loadSc();tab='home';view();if(!r.n)setTimeout(()=>toast('⚠️ نسخهٔ سرور قدیمی است؛ به استاد بگو Code.gs را دوباره Deploy کند'),900);}catch(e){login(errTxt(e,'اتصال برقرار نشد؛ اینترنت را بررسی کنید'))}}
+    try{const r=await post(u,{a:'student',num:n});if(r.err)return login(r.err);cfg.set('num',n);if(r.n)setN(r.n);D=svIn({...r,files:cleanF(r.files),num:n});loadSc();vResume();tab='home';view();if(!r.n)setTimeout(()=>toast('⚠️ نسخهٔ سرور قدیمی است؛ به استاد بگو Code.gs را دوباره Deploy کند'),900);}catch(e){login(errTxt(e,'اتصال برقرار نشد؛ اینترنت را بررسی کنید'))}}
   const mine=(k,s)=>D.files.filter(f=>f.num===D.num&&f.s===s&&f.kind===k);
   const dn=()=>{const o={};for(let s=1;s<=N;s++)o[s]=D.done.includes(s);return o};
   const chips=(cur,f,g)=>`<div class="chips" id="cc">${Array.from({length:N},(_,i)=>i+1).map(s=>`<button data-s="${s}" class="${s===cur?'on':''} ${f(s)?'d':''} ${g&&g(s)?'n':''}">${fa(s)}</button>`).join('')}</div>`;
@@ -729,10 +753,56 @@ function student(){
         <textarea id="aip" rows="5" class="t" placeholder="پلان‌های دلخواه (اختیاری)&#10;&#10;پلان ۱: نمای باز، سحرگاه، مه سبک، لنز ۲۴ میلی‌متر…&#10;&#10;پلان ۲: …"></textarea>
         <select id="ais" class="t"><option value="cinematic">🎬 سینمایی و رئال</option><option value="product">📷 عکاسی تبلیغاتی / محصول</option><option value="concept">🎨 کانسپت آرت</option><option value="sketch">✏️ استوری‌بورد خطی</option></select>
         <button class="btn pri" id="aib" type="button">🎬 ساخت تصاویر</button><div class="lb" id="aist"></div></div>
+      <div id="vbox">${vBox()}</div>
       <div class="rec" id="rbox"><button class="btn pri" id="rec" type="button">🎙️ ضبط صدا با میکروفون</button></div>
       <label class="btn upl">📎 آپلود فایل (PDF / DOC / TXT / صوتی از گوشی یا سیستم)<input type="file" id="fi" accept=".pdf,.doc,.docx,.txt,audio/*" hidden></label><div class="pg" id="pg" hidden><i></i></div>
-      <div class="thumbs">${idf.map(f=>`<span class="btn" style="display:inline-flex;gap:8px">${idLink(f)}<b data-del="${f.id}" style="cursor:pointer;color:var(--danger)">×</b></span>`).join('')}</div>
+      <div class="thumbs" id="idth">${idf.map(f=>`<span class="btn" style="display:inline-flex;gap:8px">${idLink(f)}<b data-del="${f.id}" style="cursor:pointer;color:var(--danger)">×</b></span>`).join('')}</div>
       <button class="btn" id="cls">بستن</button></div>`;$('pm').classList.add('on');}
+  /* ===== پرامپت ویدئو + ساخت ویدئو ===== */
+  const VJ={};
+  const vpOf=s=>((D.vprompts||[]).find(x=>x.s===s)||{}).p||[];
+  const planImgOf=(s,i)=>{let b=null;const re=new RegExp('^AI-s'+s+'-\\d+-'+(i+1)+'\\.jpg$');D.files.forEach(f=>{if(f.num===D.num&&f.s===s&&f.kind==='idea'&&re.test(f.name||'')&&(!b||f.t>b.t))b=f});return b};
+  const planVidOf=(s,i)=>{let b=null;const re=new RegExp('^AIV-s'+s+'-\\d+-'+(i+1)+'\\.mp4$');D.files.forEach(f=>{if(f.num===D.num&&f.s===s&&f.kind==='idea'&&re.test(f.name||'')&&(!b||f.t>b.t))b=f});return b};
+  const mmss=ms=>{const q=Math.max(0,Math.floor(ms/1000));return fa(Math.floor(q/60))+':'+(q%60<10?'۰':'')+fa(q%60)};
+  const FREE=[['https://klingai.com','Kling','اعتبار رایگان روزانه'],['https://hailuoai.video','Hailuo','اعتبار رایگان روزانه'],['https://app.pixverse.ai','PixVerse','اعتبار رایگان روزانه'],['https://dreamina.capcut.com','Dreamina','اعتبار رایگان']];
+  function vStat(i){const j=VJ[cs+'|'+i];if(!j)return '';if(j.err)return `<span style="color:var(--danger)">⚠️ ${esc(j.err)}</span>`;
+    return `⏳ در حال ساخت ویدئو… ${mmss(Date.now()-j.t0)} <small class="lb">(معمولاً ۱ تا ۴ دقیقه؛ می‌توانی پنجره را ببندی)</small>`}
+  function vBox(){const p=vpOf(cs);
+    return `<div class="sr vbx" style="margin:0"><b>🎬 پرامپت ویدئو برای هر پلان</b>
+      <small>از ایده و پلان‌های بالا، برای هر پلان یک پرامپت ویدئو ساخته می‌شود: <b>انگلیسی</b> (برای سایت‌های هوش مصنوعی) و <b>فارسی</b> (برای فهم خودت)، با شمارهٔ پلان، حرکت دوربین، نور و فضا. اگر تصویر پلان را ساخته باشی، ویدئو می‌تواند از همان تصویر شروع شود.</small>
+      <button class="btn pri" id="vpb" type="button">✨ ${p.length?'ساخت دوبارهٔ':'ساخت'} پرامپت‌های ویدئو</button><div class="lb" id="vpst"></div>
+      ${p.length?`<div class="vpr"><button class="btn" data-vall="1" type="button">📋 کپی همهٔ پلان‌ها</button></div>`+p.map((o,i)=>{const im=planImgOf(cs,i),vd=planVidOf(cs,i),run=VJ[cs+'|'+i]&&!VJ[cs+'|'+i].err;
+        return `<div class="vpc"><div class="vph"><b>🎞️ پلان ${fa(i+1)}</b>${im?`<a href="${DR.view(im.id)}" data-img="${esc(im.id)}" title="تصویر پلان (برای Image to Video دانلود کن)"><img src="${DR.th(im.id,200)}" alt=""></a>`:''}</div>
+          <div class="vpt en">${esc(o.en)}</div><div class="vpr"><button class="btn" data-vcp="en|${i}" type="button">📋 کپی انگلیسی</button></div>
+          ${o.fa?`<div class="vpt">${esc(o.fa)}</div><div class="vpr"><button class="btn" data-vcp="fa|${i}" type="button">📋 کپی فارسی</button></div>`:''}
+          ${D.vid?`<div class="vpr"><button class="btn pri" data-vgo="${i}" type="button" ${run?'disabled':''}>🎥 ${vd?'ساخت دوبارهٔ':'ساخت'} ویدئوی این پلان</button>${vd?vidLink(vd).replace('<img ','<img style="width:72px;height:48px" '):''}</div>`:''}
+          <div class="vst" id="vst${i}">${vStat(i)}</div></div>`}).join(''):''}
+    </div>
+    <div class="sr" style="margin:0"><b>🎥 ساخت ویدئو با هوش مصنوعی</b>
+      ${D.vid?`<small>دکمهٔ «🎥 ساخت ویدئوی این پلان» را بزن؛ ویدئو خودکار ساخته و همین‌جا (و در Drive کلاس) ذخیره می‌شود. حداکثر ۴ ویدئو در هر جلسه.</small><small><b>یا</b> با کیفیت بالاتر در سایت‌های رایگان:</small>`:''}
+      <small>۱) پرامپت <b>انگلیسی</b> پلان را کپی کن ۲) در یکی از این سایت‌ها بچسبان (اگر تصویر پلان را داری، روی آن بزن، ⬇ دانلود کن و در حالت <b>Image to Video</b> به‌عنوان فریم اول بده) ۳) ویدئو را دانلود کن و در «📁 تکلیف من» با «🎬 افزودن ویدئو» آپلود کن.</small>
+      <div class="vfl">${FREE.map(([h,n,t])=>`<a href="${h}" target="_blank" rel="noopener">${n}<small>${t}</small></a>`).join('')}</div></div>`}
+  const vRedraw=()=>{if($('vbox'))$('vbox').innerHTML=vBox();if($('idth'))$('idth').innerHTML=mine('idea',cs).map(f=>`<span class="btn" style="display:inline-flex;gap:8px">${idLink(f)}<b data-del="${f.id}" style="cursor:pointer;color:var(--danger)">×</b></span>`).join('')};
+  async function vpGen(b){const tx=$('idt').value.trim(),sh=($('aip').value||'').split(/\n\s*\n/).map(x=>x.trim()).filter(x=>x.length>=8).slice(0,4);
+    if(!sh.length&&tx.length<8)return toast('اول ایده یا پلان‌هایت را بنویس');
+    b.disabled=true;const st=$('vpst');if(st)st.textContent='🧠 در حال نوشتن پرامپت‌های ویدئو (انگلیسی و فارسی)…';
+    try{if(tx.length>=8)await post(u,{a:'idea',num:D.num,s:cs,text:svJoin(tx,svMine())});
+      const r=await post(u,{a:'vprompt',num:D.num,s:cs,text:tx,shots:sh});if(r.err)throw new Error(r.err);
+      await refresh();vRedraw();burst($('vbox')||document.body);toast('پرامپت‌های ویدئو آماده شد 🎬')}
+    catch(e){if($('vpst'))$('vpst').textContent='⚠️ '+e.message;b.disabled=false}}
+  async function vidStart(i,b){if(b)b.disabled=true;const k=cs+'|'+i;
+    try{const r=await post(u,{a:'vidstart',num:D.num,s:cs,i});if(r.err)throw new Error(r.err);VJ[k]={task:r.task,s:cs,i,t0:Date.now()};vRedraw();vPoll(k)}
+    catch(e){VJ[k]={err:e.message,s:cs,i};vRedraw();delete VJ[k];if(b)b.disabled=false}}
+  function vPoll(k){const j=VJ[k];if(!j||j.err)return;
+    setTimeout(async()=>{const j=VJ[k];if(!j)return;
+      try{const r=await post(u,{a:'vidpoll',num:D.num,s:j.s,task:j.task},60000);
+        if(r.err&&!r.status)throw new Error(r.err);
+        if(r.status==='done'){delete VJ[k];await refresh();toast('ویدئوی پلان '+fa(j.i+1)+' آماده شد 🎬',4000);if(j.s===cs)vRedraw();return}
+        if(r.status==='fail'){VJ[k]={...j,err:r.err||'ساخت ویدئو ناموفق بود'};if(j.s===cs)vRedraw();delete VJ[k];return}}
+      catch(e){/* خطای شبکه: دوباره تلاش می‌شود */}
+      if(Date.now()-j.t0>15*60000){VJ[k]={...j,err:'ساخت ویدئو بیش از حد طول کشید؛ بعداً صفحه را باز کن یا دوباره بساز'};if(j.s===cs)vRedraw();delete VJ[k];return}
+      const e=$('vst'+j.i);if(e&&j.s===cs)e.innerHTML=vStat(j.i);vPoll(k)},10000)}
+  const vResume=()=>(D.vtasks||[]).forEach(t=>{const k=t.s+'|'+t.i;if(!VJ[k]){VJ[k]={task:t.task,s:t.s,i:t.i,t0:t.t};vPoll(k)}});
   function avModal(){const has=AVF(D.files,D.num);
     $('pb').innerHTML=`<div class="fm" style="align-items:center;text-align:center;min-width:min(86vw,340px)"><h3 style="margin:0">📸 عکس پروفایل</h3>${avatar(D.files,D.num,D.me.name,150,true)}
       <small>${has?'برای عوض‌کردن، عکس تازه بگیر یا انتخاب کن.':'سلفی بگیر یا یک عکس از گالری انتخاب کن.'} عکس مربعی و بهینه ذخیره می‌شود و کنار نامت دیده می‌شود.</small>
@@ -780,7 +850,10 @@ function student(){
       return;}
     const b=t.closest('.seg button');
     if(b){const c=b.closest('.sr'),n=c.dataset.n,v=+b.dataset.v;sc[n]=sc[n]===v?0:v;if(sc[n])burst(b);c.querySelector('.seg').innerHTML=rateBtns(sc[n]);c.querySelector('.sl').innerHTML=rateLbl(sc[n]);return;}
-    if(t.id==='aib')return aiGen(t);if(t.id==='rec')return recStart();if(t.id==='rcs')return recStop();if(t.id==='rcu')return recSend();
+    if(t.id==='aib')return aiGen(t);if(t.id==='vpb')return vpGen(t);
+    const vg=t.closest('[data-vgo]');if(vg)return vidStart(+vg.dataset.vgo,vg);
+    const vc=t.closest('[data-vcp]');if(vc){const[l,i]=vc.dataset.vcp.split('|'),o=vpOf(cs)[+i];if(o)copy(o[l]);return}
+    if(t.closest('[data-vall]')){copy(vpOf(cs).map((o,i)=>'پلان '+(i+1)+'\nEN: '+o.en+(o.fa?'\nFA: '+o.fa:'')).join('\n\n'));return}if(t.id==='rec')return recStart();if(t.id==='rcs')return recStop();if(t.id==='rcu')return recSend();
     if(t.id==='ids'){const r=await post(u,{a:'idea',num:D.num,s:cs,text:svJoin($('idt').value,svMine())});if(r.err)return toast(r.err);burst(t);toast('ایده ذخیره شد ✓');await refresh();return;}
     if(t.id==='send'){const votes=Object.entries(sc).filter(([n,v])=>v&&seen[n+'|'+rs]).map(([target,score])=>({target,score}));
       if(!votes.length)return toast('اول کارها را ببین و حداقل به یک کار امتیاز بده');
