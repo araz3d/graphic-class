@@ -627,14 +627,6 @@ async function uploadFile(u,base,f,kind,ses,i,extra){
   return last.id||'';}
 
 /* ================= حالت دانشجو ================= */
-
-/* ===== نظرسنجی هر جلسه: ذخیره در رکورد ایده با نشانگر SV ===== */
-const SVR=/\n?<!--SV:([\s\S]*?)-->/;
-function svSplit(t){t=t||'';const m=t.match(SVR);let d=null;if(m){try{d=JSON.parse(decodeURIComponent(m[1]))}catch(e){}}return{text:t.replace(SVR,''),sv:d}}
-function svJoin(t,d){return d?(t||'')+'\n<!--SV:'+encodeURIComponent(JSON.stringify(d))+'-->':(t||'')}
-function svMap(a){return(a||[]).map(i=>{const r=svSplit(i.text);return{...i,text:r.text,sv:r.sv}})}
-function svIn(d){d.ideas=svMap(d.ideas);if(d.notes)d.notes=svMap(d.notes);return d}
-const SV_TPL={q:['محتوای جلسه روشن و منظم بود','مراحل ایده‌پردازی کامل توضیح داده شد','مخاطب و هدف تبلیغ مشخص بود','مثال‌ها و تصویرسازی‌ها مرتبط و مفید بودند','آموزش استوری‌بورد قابل فهم بود','نحوه اجرا و شات‌لیست کاربردی بود','نمونه فیلمنامه و بریف کمک‌کننده بود','زمان جلسه مناسب بود','شیوه تدریس استاد مؤثر بود'],o:['شناخت مخاطب و بریف','تکنیک‌های ایده‌پردازی','نمونه فیلمنامه','استوری‌بورد','شات‌لیست و اجرا','اصول اخلاقی تبلیغ کودک']};
 function student(){
   document.body.className='stu';
   const u=API||Q.get('u')||cfg.get('url',''),LOCK=+Q.get('c')||0;
@@ -649,10 +641,10 @@ function student(){
     <div class="sr"><b>🔐 ورود با شماره دانشجویی</b><input id="num" class="t" inputmode="numeric" autocomplete="off" placeholder="شماره دانشجویی" value="${esc(cfg.get('num',''))}"><button class="btn pri big" id="go">ورود به صفحه من ✨</button><div class="lb" style="color:var(--danger)">${msg||''}</div></div><a class="tlink" href="?t=1">🎓 ورود استاد</a>`);
     const go=()=>enter($('num').value);$('go').onclick=go;$('num').onkeydown=e=>{if(e.key==='Enter')go()};};
   const loadSc=()=>{sc={};D.votes.forEach(v=>{if(v.s===rs){sc[v.target]=v.score;seen[v.target+'|'+rs]=1;}});};
-  async function refresh(){const r=await post(u,{a:'student',num:D.num});if(!r.err){if(r.n)setN(r.n);D=svIn({...r,num:D.num});loadSc();}}
+  async function refresh(){const r=await post(u,{a:'student',num:D.num});if(!r.err){if(r.n)setN(r.n);D={...r,num:D.num};loadSc();}}
   async function enter(n){n=norm(n);if(!u)return login('آدرس سرور تنظیم نشده؛ به استاد اطلاع بدهید');
     shell('<div class="empty">در حال ورود…</div>');
-    try{const r=await post(u,{a:'student',num:n});if(r.err)return login(r.err);cfg.set('num',n);if(r.n)setN(r.n);D=svIn({...r,num:n});loadSc();tab='home';view();if(!r.n)setTimeout(()=>toast('⚠️ نسخهٔ سرور قدیمی است؛ به استاد بگو Code.gs را دوباره Deploy کند'),900);}catch(e){login('اتصال برقرار نشد؛ اینترنت را بررسی کنید')}}
+    try{const r=await post(u,{a:'student',num:n});if(r.err)return login(r.err);cfg.set('num',n);if(r.n)setN(r.n);D={...r,num:n};loadSc();tab='home';view();if(!r.n)setTimeout(()=>toast('⚠️ نسخهٔ سرور قدیمی است؛ به استاد بگو Code.gs را دوباره Deploy کند'),900);}catch(e){login('اتصال برقرار نشد؛ اینترنت را بررسی کنید')}}
   const mine=(k,s)=>D.files.filter(f=>f.num===D.num&&f.s===s&&f.kind===k);
   const dn=()=>{const o={};for(let s=1;s<=N;s++)o[s]=D.done.includes(s);return o};
   const chips=(cur,f,g)=>`<div class="chips" id="cc">${Array.from({length:N},(_,i)=>i+1).map(s=>`<button data-s="${s}" class="${s===cur?'on':''} ${f(s)?'d':''} ${g&&g(s)?'n':''}">${fa(s)}</button>`).join('')}</div>`;
@@ -681,22 +673,7 @@ function student(){
         :`<label class="stg emp upz"><span class="fl">🎬</span><b>ویدئوی این جلسه را اینجا آپلود کن</b><small>ضربه بزن؛ ویدئو را از گالری یا دوربین انتخاب کن (تا ۵۰۰ مگابایت)</small><input type="file" id="fmv" accept="video/*" hidden></label><label class="btn upl">🖼️ یا تصویر / فریم<input type="file" id="fm" accept="image/*" multiple hidden></label>`}
       <div class="pg" id="pg" hidden><i></i></div></div>
       <button class="big3" data-idea="1" style="--a:#f59e0b;--b:#ec2f8c"><span class="ic">💡</span><b>ثبت ایده برای این جلسه</b><small>${has?'✓ ثبت شده · برای ویرایش بزن':'بنویس یا فایل PDF / DOC بده'}</small></button>
-      ${svCard(has)}<div class="sr"><b>✅ جلسات تکمیل‌شده</b>${chart(dn())}<small class="lb">وقتی استاد جلسه را تأیید کند تیک می‌خورد</small></div>`;}
-
-  const svDef=()=>((D.notes||[]).find(i=>i.s===cs&&i.sv)||{}).sv;
-  const svMine=()=>(D.ideas.find(i=>i.s===cs&&i.sv&&i.sv.a)||{}).sv;
-  function svCard(has){const df=svDef();if(!df)return'';const me=svMine();
-    return has?`<button class="big3" data-sv="1" style="--a:#3fb8af;--b:#6c47ff"><span class="ic">📋</span><b>نظرسنجی ${sname(cs)}</b><small>${me?'✓ ثبت شده · برای ویرایش بزن':'نظرت دربارهٔ این جلسه را با تیک بده'}</small></button>`
-    :`<div class="sr"><b>📋 نظرسنجی ${sname(cs)}</b><small class="lb">بعد از ثبت ایده فعال می‌شود</small></div>`}
-  function svModal(){const df=svDef();if(!df)return;const me=svMine()||{a:[],o:[]};
-    $('pb').innerHTML=`<div class="fm"><h3 style="margin:0">📋 نظرسنجی ${sname(cs)}</h3><small class="lb">۱ = خیلی کم · ۵ = خیلی زیاد</small>
-    ${df.q.map((q,i)=>`<div class="sr"><b>${fa(i+1)}. ${esc(q)}</b><div class="row">${[1,2,3,4,5].map(v=>`<label style="display:inline-flex;gap:4px;align-items:center;margin:0 6px"><input type="radio" name="sq${i}" value="${v}" ${me.a[i]===v?'checked':''}>${fa(v)}</label>`).join('')}</div></div>`).join('')}
-    ${(df.o||[]).length?`<div class="sr"><b>کدام بخش‌ها بیشتر مفید بود؟</b>${df.o.map((o,i)=>`<label style="display:flex;gap:6px;align-items:center;margin:4px 0"><input type="checkbox" name="so" value="${i}" ${(me.o||[]).includes(i)?'checked':''}>${esc(o)}</label>`).join('')}</div>`:''}
-    <button class="btn pri" id="svs">ثبت نظرسنجی ✓</button><button class="btn" id="cls">بستن</button></div>`;$('pm').classList.add('on');}
-  async function svSave(t){const df=svDef(),a=df.q.map((_,i)=>{const e=document.querySelector('input[name=sq'+i+']:checked');return e?+e.value:0}),o=[...document.querySelectorAll('input[name=so]:checked')].map(e=>+e.value);
-    if(a.some(x=>!x))return toast('برای همهٔ گویه‌ها یک گزینه را تیک بزن');
-    const cur=D.ideas.find(i=>i.s===cs);const r=await post(u,{a:'idea',num:D.num,s:cs,text:svJoin(cur?cur.text:'',{a,o,t:Date.now()})});
-    if(r.err)return toast(r.err);burst(t);toast('نظرسنجی ثبت شد ✓');$('pm').classList.remove('on');$('pb').innerHTML='';await refresh();view();}
+      <div class="sr"><b>✅ جلسات تکمیل‌شده</b>${chart(dn())}<small class="lb">وقتی استاد جلسه را تأیید کند تیک می‌خورد</small></div>`;}
   function ideaModal(){const idea=D.ideas.find(i=>i.s===cs),idf=mine('idea',cs);
     $('pb').innerHTML=`<div class="fm"><h3 style="margin:0">💡 ایدهٔ ${sname(cs)}</h3>
       <textarea id="idt" rows="6" class="t" placeholder="ایده‌ات را اینجا بنویس…">${esc(idea?idea.text:'')}</textarea><button class="btn pri" id="ids">ذخیره متن ایده</button>
@@ -737,8 +714,6 @@ function student(){
     if(go){tab=go.dataset.go;if(tab!=='home'){$('app').innerHTML='<div class="empty">⏳ در حال دریافت کارها…</div>';try{await refresh()}catch(x){}}view();return window.scrollTo(0,0);}
     if(t.closest('[data-refresh]')){$('app').innerHTML='<div class="empty">⏳ در حال دریافت کارها…</div>';try{await refresh();toast('به‌روز شد ✓')}catch(x){toast('دریافت نشد؛ اینترنت را بررسی کنید')}return view();}
     if(t.id==='out'){cfg.set('num','');D=null;return login();}
-    if(t.closest('[data-sv]'))return svModal();
-    if(t.id==='svs')return svSave(t);
     if(t.closest('[data-idea]'))return ideaModal();
     if(t.closest('[data-av]'))return avModal();
     if(t.id==='cls'){recStop();$('pm').classList.remove('on');$('pb').innerHTML='';return view();}
@@ -757,7 +732,7 @@ function student(){
     const b=t.closest('.seg button');
     if(b){const c=b.closest('.sr'),n=c.dataset.n,v=+b.dataset.v;sc[n]=sc[n]===v?0:v;if(sc[n])burst(b);c.querySelector('.seg').innerHTML=rateBtns(sc[n]);c.querySelector('.sl').innerHTML=rateLbl(sc[n]);return;}
     if(t.id==='aib')return aiGen(t);if(t.id==='rec')return recStart();if(t.id==='rcs')return recStop();if(t.id==='rcu')return recSend();
-    if(t.id==='ids'){const r=await post(u,{a:'idea',num:D.num,s:cs,text:svJoin($('idt').value,svMine())});if(r.err)return toast(r.err);burst(t);toast('ایده ذخیره شد ✓');await refresh();return;}
+    if(t.id==='ids'){const r=await post(u,{a:'idea',num:D.num,s:cs,text:$('idt').value});if(r.err)return toast(r.err);burst(t);toast('ایده ذخیره شد ✓');await refresh();return;}
     if(t.id==='send'){const votes=Object.entries(sc).filter(([n,v])=>v&&seen[n+'|'+rs]).map(([target,score])=>({target,score}));
       if(!votes.length)return toast('اول کارها را ببین و حداقل به یک کار امتیاز بده');
       try{const r=await post(u,{a:'vote',num:D.num,s:rs,votes});if(r.err)return toast(r.err);burst(t);toast('امتیازها ارسال شد 🎉 (ارسال دوباره = ویرایش)');await refresh();}catch(x){toast('ارسال نشد؛ اینترنت را بررسی کنید')}}
@@ -775,7 +750,7 @@ function student(){
   async function aiGen(b){const tx=$('idt').value.trim(),sh=($('aip').value||'').split(/\n\s*\n/).map(x=>x.trim()).filter(x=>x.length>=8).slice(0,4),sty=$('ais').value;
     if(!sh.length&&tx.length<8)return toast('ایده یا پلان‌هایت را کمی کامل‌تر بنویس');
     b.disabled=true;const set=t=>{const e=$('aist');if(e)e.textContent=t};
-    try{if(tx.length>=8)await post(u,{a:'idea',num:D.num,s:cs,text:svJoin(tx,svMine())});set('🧠 در حال طراحی پلان‌های سینمایی…');
+    try{if(tx.length>=8)await post(u,{a:'idea',num:D.num,s:cs,text:tx});set('🧠 در حال طراحی پلان‌های سینمایی…');
       const p=await post(u,{a:'aiplan',num:D.num,s:cs,text:tx,shots:sh});if(p.err)throw new Error(p.err);
       for(let i=0;i<p.prompts.length;i++){set('🎬 ساخت پلان '+fa(i+1)+' از '+fa(p.prompts.length)+' … (چند ثانیه)');const r=await post(u,{a:'aiimg',num:D.num,s:cs,i,prompt:p.prompts[i],style:sty});if(r.err)throw new Error(r.err);}
       burst(b);toast('تصاویر آماده شد 🎉');await refresh();ideaModal();}
@@ -928,12 +903,7 @@ $('view').addEventListener('click',async e=>{
   const gfb=e.target.closest('[data-gf]');if(gfb){gf=gfb.dataset.gf;return render();}
   const msb=e.target.closest('[data-ms]');if(msb){msx=+msb.dataset.ms;return render();}
   if(e.target.id==='bSet2')return settings();
-  if(e.target.id==='svt'){$('svq').value=SV_TPL.q.join('\n');$('svo').value=SV_TPL.o.join('\n');return;}
-  if(e.target.id==='svc'){const t=srv.ideas.find(i=>i.num==='teacher'&&i.s===msx),df=t&&t.sv;if(!df)return;const rows=[['نام','شماره',...df.q,'بخش‌های مفید'].join('\t')];students.forEach(st=>{const r=srv.ideas.find(i=>i.num===st.num&&i.s===msx&&i.sv&&i.sv.a);if(r)rows.push([st.name,st.num,...df.q.map((_,i)=>r.sv.a[i]||''),(r.sv.o||[]).map(k=>(df.o||[])[k]).join('، ')].join('\t'))});try{await navigator.clipboard.writeText(rows.join('\n'));toast('کپی شد ✓')}catch(x){toast('کپی نشد')}return;}
-  if(e.target.id==='svp'||e.target.id==='svd'){const{u,k}=matCfg(),t=srv.ideas.find(i=>i.num==='teacher'&&i.s===msx),q=$('svq')?$('svq').value.split('\n').map(x=>x.trim()).filter(Boolean):[],o=$('svo')?$('svo').value.split('\n').map(x=>x.trim()).filter(Boolean):[],del=e.target.id==='svd';
-    if(!del&&!q.length)return toast('حداقل یک گویه بنویسید');
-    const r=await post(u,{a:'idea',key:k,num:'teacher',s:msx,text:svJoin(t?t.text:'',del?null:{q,o})});toast(r.err||(del?'فرم حذف شد':'فرم برای دانشجوها بارگذاری شد ✓'));await sync(true);return render();}
-  if(e.target.id==='mts'){const{u,k}=matCfg(),r=await post(u,{a:'idea',key:k,num:'teacher',s:msx,text:svJoin($('mt').value,((srv.ideas.find(i=>i.num==='teacher'&&i.s===msx)||{}).sv))});toast(r.err||'ذخیره شد ✓');await sync(true);return render();}
+  if(e.target.id==='mts'){const{u,k}=matCfg(),r=await post(u,{a:'idea',key:k,num:'teacher',s:msx,text:$('mt').value});toast(r.err||'ذخیره شد ✓');await sync(true);return render();}
   const mxb=e.target.closest('[data-mx]');if(mxb){e.stopPropagation();if(!confirm('این فایل حذف شود؟'))return;const{u,k}=matCfg();await post(u,{a:'del',key:k,num:'teacher',id:mxb.dataset.mx});await sync(true);return render();}
   if(e.target.id==='bPlay'){const l=galList();return l.length?viewer(l,0):toast('کاری برای نمایش نیست');}
   const tl=e.target.closest('.gt3');
@@ -992,7 +962,7 @@ async function sync(q){
   if(!sync.r){sync.r=1;pushRoster();pushNotes(u);}
   try{const a=await post(u,{a:'all',key:cfg.get('key','')});if(a.err){if(/کلید/.test(a.err)){cfg.set('key','');location.replace(location.pathname+'?t=1');return}if(!q)toast(a.err);return;}
     if(a.n&&a.n!==N){setN(a.n);cfg.set('n',a.n);}
-    srv={files:a.files||[],ideas:svMap(a.ideas),done:a.done||[]};
+    srv={files:a.files||[],ideas:a.ideas||[],done:a.done||[]};
     const best={};(a.votes||[]).forEach(v=>{if(v.rater===v.target||!(v.score>=1&&v.score<=5))return;const k=v.rater+'|'+v.s+'|'+v.target;if(!best[k]||v.t>=best[k].t)best[k]={...v,k};});
     await putMany('votes',Object.values(best));
     const byNum={};students.forEach(s=>byNum[s.num]=s);
@@ -1024,11 +994,6 @@ const matCfg=()=>({u:(API||cfg.get('url','')),k:cfg.get('key','')});
 async function upMat(fs){const{u,k}=matCfg();UP.begin(fs.length);
   try{for(let i=0;i<fs.length;i++)await uploadWithPoster(u,{num:'teacher',key:k},fs[i],'material',msx,i);UP.end(true,'آپلود کامل شد 🎉');burst(document.body);}catch(x){UP.end(false,'آپلود ناموفق: '+x.message)}
   await sync(true);render();}
-function svPanel(s){const t=srv.ideas.find(i=>i.num==='teacher'&&i.s===s),df=t&&t.sv,R=srv.ideas.filter(i=>i.num!=='teacher'&&i.s===s&&i.sv&&i.sv.a);
-  const avg=i=>R.length?R.reduce((x,r)=>x+(r.sv.a[i]||0),0)/R.length:0;
-  const res=df&&R.length?`<div style="margin-top:10px"><b>📊 نتایج: ${fa(R.length)} پاسخ از ${fa(students.length)} دانشجو</b>${df.q.map((q,i)=>`<div class="lb" style="display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--bd,#ddd);padding:4px 0"><span>${esc(q)}</span><b>${fa(avg(i))} از ۵</b></div>`).join('')}${(df.o||[]).map((o,i)=>`<div class="lb">${esc(o)}: <b>${fa(R.filter(r=>(r.sv.o||[]).includes(i)).length)}</b> نفر</div>`).join('')}<button class="btn" id="svc" style="margin-top:6px">📋 کپی نتایج برای جدول</button></div>`:(df?'<small class="lb">هنوز پاسخی ثبت نشده است</small>':'');
-  return `<div class="sr"><b>📋 فرم نظرسنجی ${sname(s)}</b><small class="lb">هر خط یک گویه (مقیاس ۱ تا ۵)</small><textarea id="svq" rows="6" placeholder="هر خط یک گویه">${esc(df?df.q.join('\n'):'')}</textarea><small class="lb">گزینه‌های «کدام بخش مفید بود؟» (هر خط یک گزینه، اختیاری)</small><textarea id="svo" rows="4">${esc(df?(df.o||[]).join('\n'):'')}</textarea>
-  <div class="row"><button class="btn" id="svt">📄 قالب آماده</button><button class="btn pri" id="svp">بارگذاری فرم برای دانشجوها</button>${df?'<button class="btn dng" id="svd">حذف فرم</button>':''}</div>${res}</div>`}
 function renderMaterials(){
   const{u,k}=matCfg();
   if(!u||!k){$('view').innerHTML='<div class="empty">ابتدا آدرس اتصال و کلید معلم را در ⚙️ تنظیمات وارد کنید.<br><br><button class="btn pri" id="bSet2">⚙️ باز کردن تنظیمات</button></div>';return;}
@@ -1037,7 +1002,7 @@ function renderMaterials(){
       <span class="sp"></span><div class="kpi"><div><b>${cu(srv.files.filter(f=>f.kind==='material').length)}</b><small>فایل در کل</small></div><div><b>${cu(sessions().filter(has).length)}</b><small>جلسه دارای مطلب</small></div></div></div>
     <div class="reel">${sessions().map(x=>`<button class="rl ${x===s?'on':''}" data-ms="${x}" style="--q:${has(x)?1:0}">${fa(x)}<i></i></button>`).join('')}</div>
     <div class="mwrap"><div class="sr"><b>✍️ توضیح / خلاصهٔ درس — ${sname(s)}</b><textarea id="mt" rows="6" placeholder="توضیح/خلاصهٔ درس این جلسه…">${esc(t?t.text:'')}</textarea><button class="btn pri" id="mts">ذخیره توضیح</button></div>
-      ${svPanel(s)}<div class="sr"><b>📎 فایل‌های ${sname(s)}</b><label class="stg emp upz"><span class="fl">📤</span><b>فایل را اینجا رها کنید یا کلیک کنید</b><small>PDF، ویدئو، تصویر، اسلاید …</small><input type="file" id="mf" multiple hidden></label></div></div>
+      <div class="sr"><b>📎 فایل‌های ${sname(s)}</b><label class="stg emp upz"><span class="fl">📤</span><b>فایل را اینجا رها کنید یا کلیک کنید</b><small>PDF، ویدئو، تصویر، اسلاید …</small><input type="file" id="mf" multiple hidden></label></div></div>
     ${L.length?`<div class="mgrid mg2">${L.map(f=>`<div class="mc" data-m="${f.id}">${cover(f,520)}${isVid(f)?'<span class="stg-pl"><i>▶</i></span>':''}<span class="mcl">${esc(f.name)}</span><button class="stg-x" data-mx="${f.id}" title="حذف">×</button></div>`).join('')}</div>`:'<div class="empty">هنوز فایلی برای این جلسه نگذاشته‌اید</div>'}`;
 }
 function guide(){$('ff').innerHTML=`<h3 style="margin:0">❓ روند کار</h3><ol class="gd">
