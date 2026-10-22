@@ -493,20 +493,31 @@ const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const fa=n=>n==null?'—':(+n).toLocaleString('fa-IR',{maximumFractionDigits:1});
 const lvOf=x=>x?Math.min(5,Math.max(1,Math.round(x))):0;
 const $=id=>document.getElementById(id);
-function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',2600);}
+function toast(t,ms){const e=$('toast');if(!e)return;e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',ms||(/⚠️|ناموفق|نشد|خطا/.test(t)?5000:2600));}
+/* هر خطای شبکه‌ای که جایی گرفته نشده باشد، به‌جای بی‌صدا ماندن، برای کاربر نمایش داده می‌شود */
+addEventListener('unhandledrejection',e=>{const m=e.reason&&e.reason.message;if(m){e.preventDefault();toast('⚠️ '+m)}});
+const errTxt=(e,d)=>(e&&e.message)||d||'خطای ناشناخته';
 const copy=async t=>{try{await navigator.clipboard.writeText(t);toast('کپی شد ✓')}catch(e){prompt('کپی کنید:',t)}};
 const rateBtns=(on,dis)=>[1,2,3,4,5].map(v=>`<button class="lv${v} ${on===v?'on':''}" data-v="${v}" title="${LV[v][0]}" ${dis?'disabled':''}><span class="em">${LV[v][1]}</span><span class="nu">${fa(v)}</span></button>`).join('');
 const rateLbl=v=>v?`<span class="lv${v}"><b>${LV[v][1]} ${LV[v][0]}</b></span>`:'';
 
 const sname=s=>s===FINAL?'جلسه '+fa(FINAL)+' · ژوری و تحویل نهایی':'جلسه '+fa(s);
-const post=(u,d)=>fetch(u,{method:'POST',body:JSON.stringify(d)}).then(async r=>{const t=await r.text();try{return JSON.parse(t)}catch(e){throw new Error('پاسخ نامعتبر از سرور؛ نسخهٔ جدید Deploy نشده یا دسترسی Anyone نیست')}});
+const post=(u,d,ms)=>{if(!u)return Promise.reject(new Error('آدرس سرور تنظیم نشده است'));const ac=window.AbortController?new AbortController():null,tm=ac&&setTimeout(()=>ac.abort(),ms||120000);
+  return fetch(u,{method:'POST',body:JSON.stringify(d),signal:ac?ac.signal:undefined})
+  .catch(e=>{throw new Error(e&&e.name==='AbortError'?'پاسخ سرور بیش از حد طول کشید؛ اینترنت را بررسی و دوباره امتحان کن':navigator.onLine===false?'اینترنت قطع است؛ اتصال را بررسی کن':'اتصال به سرور برقرار نشد؛ اینترنت یا فیلترشکن را بررسی کن')})
+  .then(async r=>{const t=await r.text();if(!r.ok)throw new Error('خطای سرور گوگل ('+r.status+')؛ کمی بعد دوباره امتحان کن');
+    try{return JSON.parse(t)}catch(e){throw new Error(/accounts\.google|ServiceLogin|signin/i.test(t)?'دسترسی Web app باید روی «Anyone» باشد':'پاسخ نامعتبر از سرور؛ نسخهٔ جدید Deploy نشده یا دسترسی Anyone نیست')}})
+  .finally(()=>tm&&clearTimeout(tm))};
+/* شناسه‌های فایل فقط حروف/عدد/خط تیره؛ هر ردیف مشکوک کنار گذاشته می‌شود */
+const okId=x=>/^[\w-]{10,}$/.test(String(x||''));
+const cleanF=a=>(a||[]).filter(f=>f&&okId(f.id)).map(f=>({...f,poster:okId(f.poster)?f.poster:''}));
 const DR={th:(id,w)=>`https://drive.google.com/thumbnail?id=${id}&sz=w${w||600}`,pv:id=>`https://drive.google.com/file/d/${id}/preview`,view:id=>`https://drive.google.com/file/d/${id}/view`};
 const isImg=m=>/^image/.test(m.mime),isVid=m=>/^video/.test(m.mime);
 const mThumb=m=>isImg(m)||isVid(m)?`<img src="${DR.th(m.id)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'doc',textContent:'${isVid(m)?'🎬':'🖼️'}'}))">`:`<div class="doc">📄</div>`;
 const thb=(m,a,x)=>`<div class="th" ${a}>${mThumb(m)}${isVid(m)?'<span class="pl">▶</span>':''}${x?`<button class="x" data-del="${m.id}">×</button>`:''}</div>`;
 const DRV=id=>`https://drive.google.com/uc?export=download&id=${id}`;
 const IFR=id=>`<iframe src="${DR.pv(id)}" allow="autoplay;fullscreen" allowfullscreen></iframe>`;
-const PXB=(m,t,c)=>`<button class="btn ${c||''}" data-px="${m.id}" data-mime="${m.mime||''}">${t}</button>`;
+const PXB=(m,t,c)=>`<button class="btn ${c||''}" data-px="${esc(m.id)}" data-mime="${esc(m.mime||'')}">${t}</button>`;
 const PXPH=m=>`<div class="pw" style="background:#000 center/contain no-repeat url(${DR.th(m.id,1280)})"><span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">${PXB(m,'▶ پخش','pri')}</span></div>`;
 const pwHtml=m=>cfg.get('px','')==='1'&&isVid(m)?PXPH(m):API_KEY&&isVid(m)?`<div class="pw"><video controls playsinline preload="metadata" poster="${DR.th(m.id,1280)}" src="https://www.googleapis.com/drive/v3/files/${m.id}?alt=media&key=${API_KEY}" onerror="this.parentNode.classList.add('cr');this.outerHTML=IFR('${m.id}')"></video><button class="fx">✕</button></div>`:`<div class="pw cr">${IFR(m.id)}<button class="fx">✕</button></div>`;
 const AUD=f=>/^audio/.test(f.mime||'');
@@ -591,7 +602,19 @@ const squareJpeg=(file,size=512)=>new Promise((ok,no)=>{const img=new Image(),ur
   img.onload=()=>{const s=Math.min(img.naturalWidth,img.naturalHeight),c=document.createElement('canvas');c.width=c.height=size;
     c.getContext('2d').drawImage(img,(img.naturalWidth-s)/2,(img.naturalHeight-s)/2,s,s,0,0,size,size);URL.revokeObjectURL(url);c.toBlob(b=>b?ok(b):no(new Error('تبدیل عکس ناموفق بود')),'image/jpeg',.88)};
   img.onerror=()=>{URL.revokeObjectURL(url);no(new Error('این عکس خوانده نشد'))};img.src=url;});
+/* فشرده‌سازی تصویر در مرورگر: حداکثر عرض ۱۲۸۰ (و ارتفاع ۲۴۰۰) پیکسل، JPEG با کیفیت ۸۵٪.
+   GIF، SVG و HEIC دست‌نخورده می‌مانند؛ اگر نسخهٔ فشرده بزرگ‌تر شد، همان فایل اصلی می‌رود. */
+const shrinkImg=(f,maxW=1280,maxH=2400,q=.85)=>new Promise(ok=>{
+  if(!/^image\/(jpeg|jpg|png|webp|bmp)$/i.test(f.type||''))return ok(f);
+  const img=new Image(),url=URL.createObjectURL(f);
+  img.onload=()=>{URL.revokeObjectURL(url);const w=img.naturalWidth,h=img.naturalHeight;if(!w||!h)return ok(f);
+    const k=Math.min(1,maxW/w,maxH/h);if(k===1&&f.size<=600*1024)return ok(f);
+    try{const c=document.createElement('canvas');c.width=Math.round(w*k);c.height=Math.round(h*k);const x=c.getContext('2d');
+      x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.drawImage(img,0,0,c.width,c.height);
+      c.toBlob(b=>{if(!b||b.size>=f.size)return ok(f);ok(new File([b],String(f.name||'image').replace(/\.[^.]+$/,'')+'.jpg',{type:'image/jpeg',lastModified:Date.now()}))},'image/jpeg',q)}catch(e){ok(f)}};
+  img.onerror=()=>{URL.revokeObjectURL(url);ok(f)};img.src=url});
 async function uploadWithPoster(u,base,f,kind,ses,i){let ex;
+  if(/^image\//.test(f.type||'')){UP.draw(0,'🗜️ '+esc(f.name),'در حال بهینه‌سازی تصویر…');const o=f.size;f=await shrinkImg(f);if(f.size<o)console.log('image',Math.round(o/1024)+'KB →',Math.round(f.size/1024)+'KB');}
   if(/^video/.test(f.type)&&(kind==='media'||kind==='material')){try{const b=await framePoster(f);
     if(b){const pid=await uploadFile(u,base,new File([b],f.name+'.jpg',{type:'image/jpeg'}),'poster',ses,i);if(pid)ex={poster:pid};}}catch(e){}}
   return uploadFile(u,base,f,kind,ses,i,ex);}
@@ -609,7 +632,8 @@ const movePill=()=>{const tp=$('tp'),on=document.querySelector('.tab.on');if(!tp
 
 /* ===== آپلود مشترک (دانشجو و استاد) ===== */
 const b64=b=>new Promise(ok=>{const r=new FileReader();r.onload=()=>ok(r.result.split(',')[1]);r.readAsDataURL(b)});
-const postR=async(u,d)=>{for(let t=0;;t++){try{return await post(u,d)}catch(e){if(t>1)throw e;await new Promise(r=>setTimeout(r,1500))}}};
+const postR=async(u,d)=>{for(let t=0;;t++){let r;try{r=await post(u,d)}catch(e){if(t>=3)throw e;await new Promise(z=>setTimeout(z,1500*2**t));continue}
+  if(r&&r.code==='RETRY'&&t<3){await new Promise(z=>setTimeout(z,1500*2**t));continue}return r}};
 const mb=b=>fa(b/1048576)+' MB';
 const UP={e:null,n:1,i:0,nm:'',sz:1,t0:0,
  box(){if(!this.e||!document.body.contains(this.e)){this.e=document.createElement('div');this.e.id='upl';document.body.appendChild(this.e)}return this.e},
@@ -617,7 +641,7 @@ const UP={e:null,n:1,i:0,nm:'',sz:1,t0:0,
  begin(n){this.n=n;window.onbeforeunload=()=>'آپلود در جریان است'},
  file(nm,i,sz){this.nm=nm;this.i=i;this.sz=sz||1;this.t0=Date.now();this.draw(0,'⏳ '+esc(nm),`فایل ${fa(i+1)} از ${fa(this.n)} · در حال آماده‌سازی…`)},
  prog(l){const p=l/this.sz*100,sp=l/Math.max(1,(Date.now()-this.t0)/1000);this.draw(p,'⬆️ '+esc(this.nm),`${mb(l)} از ${mb(this.sz)} · ${mb(sp)}/ث · فایل ${fa(this.i+1)} از ${fa(this.n)}`)},
- end(ok,msg){window.onbeforeunload=null;this.draw(ok?100:0,msg,'',ok?'ok':'er');setTimeout(()=>{if(this.e){this.e.remove();this.e=null}},ok?2500:25000);if(!ok&&this.e)this.e.onclick=()=>{this.e.remove();this.e=null}}};
+ end(ok,msg){window.onbeforeunload=null;this.draw(ok?100:0,esc(msg),'',ok?'ok':'er');setTimeout(()=>{if(this.e){this.e.remove();this.e=null}},ok?2500:25000);if(!ok&&this.e)this.e.onclick=()=>{this.e.remove();this.e=null}}};
 async function uploadFile(u,base,f,kind,ses,i,extra){
   if(f.size>524288000)throw new Error('حجم فایل '+mb(f.size)+' است و از ۵۰۰ مگابایت بیشتر است؛ ویدئو را با کیفیت ۷۲۰p ضبط یا فشرده کن');
   UP.file(f.name,i||0,f.size);
@@ -627,6 +651,14 @@ async function uploadFile(u,base,f,kind,ses,i,extra){
   return last.id||'';}
 
 /* ================= حالت دانشجو ================= */
+
+/* ===== نظرسنجی هر جلسه: ذخیره در رکورد ایده با نشانگر SV ===== */
+const SVR=/\n?<!--SV:([\s\S]*?)-->/;
+function svSplit(t){t=t||'';const m=t.match(SVR);let d=null;if(m){try{d=JSON.parse(decodeURIComponent(m[1]))}catch(e){}}return{text:t.replace(SVR,''),sv:d}}
+function svJoin(t,d){return d?(t||'')+'\n<!--SV:'+encodeURIComponent(JSON.stringify(d))+'-->':(t||'')}
+function svMap(a){return(a||[]).map(i=>{const r=svSplit(i.text);return{...i,text:r.text,sv:r.sv}})}
+function svIn(d){d.ideas=svMap(d.ideas);if(d.notes)d.notes=svMap(d.notes);return d}
+const SV_TPL={q:['محتوای جلسه روشن و منظم بود','مراحل ایده‌پردازی کامل توضیح داده شد','مخاطب و هدف تبلیغ مشخص بود','مثال‌ها و تصویرسازی‌ها مرتبط و مفید بودند','آموزش استوری‌بورد قابل فهم بود','نحوه اجرا و شات‌لیست کاربردی بود','نمونه فیلمنامه و بریف کمک‌کننده بود','زمان جلسه مناسب بود','شیوه تدریس استاد مؤثر بود'],o:['شناخت مخاطب و بریف','تکنیک‌های ایده‌پردازی','نمونه فیلمنامه','استوری‌بورد','شات‌لیست و اجرا','اصول اخلاقی تبلیغ کودک']};
 function student(){
   document.body.className='stu';
   const u=API||Q.get('u')||cfg.get('url',''),LOCK=+Q.get('c')||0;
@@ -638,13 +670,13 @@ function student(){
     $('pm').onclick=e=>{if(e.target.id==='pm'){$('pm').classList.remove('on');$('pb').innerHTML='';}};
     $('app').onclick=click;$('app').onchange=change;$('pm').addEventListener('click',click);$('pm').addEventListener('change',change);};
   const login=msg=>{shell(`<div class="hero"><span class="lg">${LOGO.replace(/36/g,'72')}</span><h1 style="margin:8px 0 2px">کارگاه گرافیک و تبلیغات</h1><small class="lb">دانشگاه محقق اردبیل · ترم سه · استاد علی حسین عباس‌زاده</small></div>
-    <div class="sr"><b>🔐 ورود با شماره دانشجویی</b><input id="num" class="t" inputmode="numeric" autocomplete="off" placeholder="شماره دانشجویی" value="${esc(cfg.get('num',''))}"><button class="btn pri big" id="go">ورود به صفحه من ✨</button><div class="lb" style="color:var(--danger)">${msg||''}</div></div><a class="tlink" href="?t=1">🎓 ورود استاد</a>`);
+    <div class="sr"><b>🔐 ورود با شماره دانشجویی</b><input id="num" class="t" inputmode="numeric" autocomplete="off" placeholder="شماره دانشجویی" value="${esc(cfg.get('num',''))}"><button class="btn pri big" id="go">ورود به صفحه من ✨</button><div class="lb" style="color:var(--danger)">${esc(msg||'')}</div></div><a class="tlink" href="?t=1">🎓 ورود استاد</a>`);
     const go=()=>enter($('num').value);$('go').onclick=go;$('num').onkeydown=e=>{if(e.key==='Enter')go()};};
   const loadSc=()=>{sc={};D.votes.forEach(v=>{if(v.s===rs){sc[v.target]=v.score;seen[v.target+'|'+rs]=1;}});};
-  async function refresh(){const r=await post(u,{a:'student',num:D.num});if(!r.err){if(r.n)setN(r.n);D={...r,num:D.num};loadSc();}}
+  async function refresh(){const r=await post(u,{a:'student',num:D.num});if(!r.err){if(r.n)setN(r.n);D=svIn({...r,files:cleanF(r.files),num:D.num});loadSc();}}
   async function enter(n){n=norm(n);if(!u)return login('آدرس سرور تنظیم نشده؛ به استاد اطلاع بدهید');
     shell('<div class="empty">در حال ورود…</div>');
-    try{const r=await post(u,{a:'student',num:n});if(r.err)return login(r.err);cfg.set('num',n);if(r.n)setN(r.n);D={...r,num:n};loadSc();tab='home';view();if(!r.n)setTimeout(()=>toast('⚠️ نسخهٔ سرور قدیمی است؛ به استاد بگو Code.gs را دوباره Deploy کند'),900);}catch(e){login('اتصال برقرار نشد؛ اینترنت را بررسی کنید')}}
+    try{const r=await post(u,{a:'student',num:n});if(r.err)return login(r.err);cfg.set('num',n);if(r.n)setN(r.n);D=svIn({...r,files:cleanF(r.files),num:n});loadSc();tab='home';view();if(!r.n)setTimeout(()=>toast('⚠️ نسخهٔ سرور قدیمی است؛ به استاد بگو Code.gs را دوباره Deploy کند'),900);}catch(e){login(errTxt(e,'اتصال برقرار نشد؛ اینترنت را بررسی کنید'))}}
   const mine=(k,s)=>D.files.filter(f=>f.num===D.num&&f.s===s&&f.kind===k);
   const dn=()=>{const o={};for(let s=1;s<=N;s++)o[s]=D.done.includes(s);return o};
   const chips=(cur,f,g)=>`<div class="chips" id="cc">${Array.from({length:N},(_,i)=>i+1).map(s=>`<button data-s="${s}" class="${s===cur?'on':''} ${f(s)?'d':''} ${g&&g(s)?'n':''}">${fa(s)}</button>`).join('')}</div>`;
@@ -673,7 +705,22 @@ function student(){
         :`<label class="stg emp upz"><span class="fl">🎬</span><b>ویدئوی این جلسه را اینجا آپلود کن</b><small>ضربه بزن؛ ویدئو را از گالری یا دوربین انتخاب کن (تا ۵۰۰ مگابایت)</small><input type="file" id="fmv" accept="video/*" hidden></label><label class="btn upl">🖼️ یا تصویر / فریم<input type="file" id="fm" accept="image/*" multiple hidden></label>`}
       <div class="pg" id="pg" hidden><i></i></div></div>
       <button class="big3" data-idea="1" style="--a:#f59e0b;--b:#ec2f8c"><span class="ic">💡</span><b>ثبت ایده برای این جلسه</b><small>${has?'✓ ثبت شده · برای ویرایش بزن':'بنویس یا فایل PDF / DOC بده'}</small></button>
-      <div class="sr"><b>✅ جلسات تکمیل‌شده</b>${chart(dn())}<small class="lb">وقتی استاد جلسه را تأیید کند تیک می‌خورد</small></div>`;}
+      ${svCard(has)}<div class="sr"><b>✅ جلسات تکمیل‌شده</b>${chart(dn())}<small class="lb">وقتی استاد جلسه را تأیید کند تیک می‌خورد</small></div>`;}
+
+  const svDef=()=>((D.notes||[]).find(i=>i.s===cs&&i.sv)||{}).sv;
+  const svMine=()=>(D.ideas.find(i=>i.s===cs&&i.sv&&i.sv.a)||{}).sv;
+  function svCard(has){const df=svDef();if(!df)return'';const me=svMine();
+    return has?`<button class="big3" data-sv="1" style="--a:#3fb8af;--b:#6c47ff"><span class="ic">📋</span><b>نظرسنجی ${sname(cs)}</b><small>${me?'✓ ثبت شده · برای ویرایش بزن':'نظرت دربارهٔ این جلسه را با تیک بده'}</small></button>`
+    :`<div class="sr"><b>📋 نظرسنجی ${sname(cs)}</b><small class="lb">بعد از ثبت ایده فعال می‌شود</small></div>`}
+  function svModal(){const df=svDef();if(!df)return;const me=svMine()||{a:[],o:[]};
+    $('pb').innerHTML=`<div class="fm"><h3 style="margin:0">📋 نظرسنجی ${sname(cs)}</h3><small class="lb">۱ = خیلی کم · ۵ = خیلی زیاد</small>
+    ${df.q.map((q,i)=>`<div class="sr"><b>${fa(i+1)}. ${esc(q)}</b><div class="row">${[1,2,3,4,5].map(v=>`<label style="display:inline-flex;gap:4px;align-items:center;margin:0 6px"><input type="radio" name="sq${i}" value="${v}" ${me.a[i]===v?'checked':''}>${fa(v)}</label>`).join('')}</div></div>`).join('')}
+    ${(df.o||[]).length?`<div class="sr"><b>کدام بخش‌ها بیشتر مفید بود؟</b>${df.o.map((o,i)=>`<label style="display:flex;gap:6px;align-items:center;margin:4px 0"><input type="checkbox" name="so" value="${i}" ${(me.o||[]).includes(i)?'checked':''}>${esc(o)}</label>`).join('')}</div>`:''}
+    <button class="btn pri" id="svs">ثبت نظرسنجی ✓</button><button class="btn" id="cls">بستن</button></div>`;$('pm').classList.add('on');}
+  async function svSave(t){const df=svDef(),a=df.q.map((_,i)=>{const e=document.querySelector('input[name=sq'+i+']:checked');return e?+e.value:0}),o=[...document.querySelectorAll('input[name=so]:checked')].map(e=>+e.value);
+    if(a.some(x=>!x))return toast('برای همهٔ گویه‌ها یک گزینه را تیک بزن');
+    const cur=D.ideas.find(i=>i.s===cs);const r=await post(u,{a:'idea',num:D.num,s:cs,text:svJoin(cur?cur.text:'',{a,o,t:Date.now()})});
+    if(r.err)return toast(r.err);burst(t);toast('نظرسنجی ثبت شد ✓');$('pm').classList.remove('on');$('pb').innerHTML='';await refresh();view();}
   function ideaModal(){const idea=D.ideas.find(i=>i.s===cs),idf=mine('idea',cs);
     $('pb').innerHTML=`<div class="fm"><h3 style="margin:0">💡 ایدهٔ ${sname(cs)}</h3>
       <textarea id="idt" rows="6" class="t" placeholder="ایده‌ات را اینجا بنویس…">${esc(idea?idea.text:'')}</textarea><button class="btn pri" id="ids">ذخیره متن ایده</button>
@@ -698,7 +745,7 @@ function student(){
       <div class="sr"><div class="row" style="justify-content:space-between;align-items:center;margin:0"><b>${fa(W.length)} کار آماده — ${fa(left)} بدون امتیاز</b><button class="btn" data-refresh="1">⟳ بروزرسانی</button></div>
       <small>۱) روی کار همکلاسی بزن تا همان‌جا با پلیر کامل پخش شود ۲) چند ثانیه ببین؛ دکمه‌های امتیاز فعال می‌شود ۳) «ارسال امتیازها» را بزن.</small></div>
       ${W.map(({o,fs})=>{const ok=seen[o.num+'|'+rs];
-        return `<div class="sr" data-n="${o.num}"><div class="who">${avatar(D.files,o.num,o.name,40)}<b>${esc(o.name)}</b></div>${stage(fs)}<div class="pbox"></div>
+        return `<div class="sr" data-n="${esc(o.num)}"><div class="who">${avatar(D.files,o.num,o.name,40)}<b>${esc(o.name)}</b></div>${stage(fs)}<div class="pbox"></div>
         <div class="lb lk">${ok?'✅ دیدی؛ امتیاز بده':'👆 کار را باز کن و ببین تا امتیاز فعال شود'}</div>
         <div class="seg">${rateBtns(sc[o.num],!ok)}</div><div class="lb sl">${rateLbl(sc[o.num])}</div></div>`}).join('')||'<div class="empty">هنوز کاری برای این جلسه بارگذاری نشده<br><small>بعداً «بروزرسانی» را بزن</small></div>'}
       ${E.length?`<div class="sr"><small class="lb">هنوز کاری بارگذاری نکرده‌اند: ${E.map(x=>esc(x.o.name)).join('، ')}</small></div>`:''}
@@ -714,6 +761,8 @@ function student(){
     if(go){tab=go.dataset.go;if(tab!=='home'){$('app').innerHTML='<div class="empty">⏳ در حال دریافت کارها…</div>';try{await refresh()}catch(x){}}view();return window.scrollTo(0,0);}
     if(t.closest('[data-refresh]')){$('app').innerHTML='<div class="empty">⏳ در حال دریافت کارها…</div>';try{await refresh();toast('به‌روز شد ✓')}catch(x){toast('دریافت نشد؛ اینترنت را بررسی کنید')}return view();}
     if(t.id==='out'){cfg.set('num','');D=null;return login();}
+    if(t.closest('[data-sv]'))return svModal();
+    if(t.id==='svs')return svSave(t);
     if(t.closest('[data-idea]'))return ideaModal();
     if(t.closest('[data-av]'))return avModal();
     if(t.id==='cls'){recStop();$('pm').classList.remove('on');$('pb').innerHTML='';return view();}
@@ -732,10 +781,10 @@ function student(){
     const b=t.closest('.seg button');
     if(b){const c=b.closest('.sr'),n=c.dataset.n,v=+b.dataset.v;sc[n]=sc[n]===v?0:v;if(sc[n])burst(b);c.querySelector('.seg').innerHTML=rateBtns(sc[n]);c.querySelector('.sl').innerHTML=rateLbl(sc[n]);return;}
     if(t.id==='aib')return aiGen(t);if(t.id==='rec')return recStart();if(t.id==='rcs')return recStop();if(t.id==='rcu')return recSend();
-    if(t.id==='ids'){const r=await post(u,{a:'idea',num:D.num,s:cs,text:$('idt').value});if(r.err)return toast(r.err);burst(t);toast('ایده ذخیره شد ✓');await refresh();return;}
+    if(t.id==='ids'){const r=await post(u,{a:'idea',num:D.num,s:cs,text:svJoin($('idt').value,svMine())});if(r.err)return toast(r.err);burst(t);toast('ایده ذخیره شد ✓');await refresh();return;}
     if(t.id==='send'){const votes=Object.entries(sc).filter(([n,v])=>v&&seen[n+'|'+rs]).map(([target,score])=>({target,score}));
       if(!votes.length)return toast('اول کارها را ببین و حداقل به یک کار امتیاز بده');
-      try{const r=await post(u,{a:'vote',num:D.num,s:rs,votes});if(r.err)return toast(r.err);burst(t);toast('امتیازها ارسال شد 🎉 (ارسال دوباره = ویرایش)');await refresh();}catch(x){toast('ارسال نشد؛ اینترنت را بررسی کنید')}}
+      try{const r=await post(u,{a:'vote',num:D.num,s:rs,votes});if(r.err)return toast(r.err);burst(t);toast('امتیازها ارسال شد 🎉 (ارسال دوباره = ویرایش)');await refresh();}catch(x){toast('⚠️ ارسال نشد: '+errTxt(x))}}
   }
   let MR=null,MC=[],MT=0,MI=0,MB=null;
   async function recStart(){if(!navigator.mediaDevices||!window.MediaRecorder)return toast('این مرورگر ضبط صدا ندارد؛ فایل صوتی انتخاب کنید');
@@ -750,7 +799,7 @@ function student(){
   async function aiGen(b){const tx=$('idt').value.trim(),sh=($('aip').value||'').split(/\n\s*\n/).map(x=>x.trim()).filter(x=>x.length>=8).slice(0,4),sty=$('ais').value;
     if(!sh.length&&tx.length<8)return toast('ایده یا پلان‌هایت را کمی کامل‌تر بنویس');
     b.disabled=true;const set=t=>{const e=$('aist');if(e)e.textContent=t};
-    try{if(tx.length>=8)await post(u,{a:'idea',num:D.num,s:cs,text:tx});set('🧠 در حال طراحی پلان‌های سینمایی…');
+    try{if(tx.length>=8)await post(u,{a:'idea',num:D.num,s:cs,text:svJoin(tx,svMine())});set('🧠 در حال طراحی پلان‌های سینمایی…');
       const p=await post(u,{a:'aiplan',num:D.num,s:cs,text:tx,shots:sh});if(p.err)throw new Error(p.err);
       for(let i=0;i<p.prompts.length;i++){set('🎬 ساخت پلان '+fa(i+1)+' از '+fa(p.prompts.length)+' … (چند ثانیه)');const r=await post(u,{a:'aiimg',num:D.num,s:cs,i,prompt:p.prompts[i],style:sty});if(r.err)throw new Error(r.err);}
       burst(b);toast('تصاویر آماده شد 🎉');await refresh();ideaModal();}
@@ -903,7 +952,12 @@ $('view').addEventListener('click',async e=>{
   const gfb=e.target.closest('[data-gf]');if(gfb){gf=gfb.dataset.gf;return render();}
   const msb=e.target.closest('[data-ms]');if(msb){msx=+msb.dataset.ms;return render();}
   if(e.target.id==='bSet2')return settings();
-  if(e.target.id==='mts'){const{u,k}=matCfg(),r=await post(u,{a:'idea',key:k,num:'teacher',s:msx,text:$('mt').value});toast(r.err||'ذخیره شد ✓');await sync(true);return render();}
+  if(e.target.id==='svt'){$('svq').value=SV_TPL.q.join('\n');$('svo').value=SV_TPL.o.join('\n');return;}
+  if(e.target.id==='svc'){const t=srv.ideas.find(i=>i.num==='teacher'&&i.s===msx),df=t&&t.sv;if(!df)return;const rows=[['نام','شماره',...df.q,'بخش‌های مفید'].join('\t')];students.forEach(st=>{const r=srv.ideas.find(i=>i.num===st.num&&i.s===msx&&i.sv&&i.sv.a);if(r)rows.push([st.name,st.num,...df.q.map((_,i)=>r.sv.a[i]||''),(r.sv.o||[]).map(k=>(df.o||[])[k]).join('، ')].join('\t'))});try{await navigator.clipboard.writeText(rows.join('\n'));toast('کپی شد ✓')}catch(x){toast('کپی نشد')}return;}
+  if(e.target.id==='svp'||e.target.id==='svd'){const{u,k}=matCfg(),t=srv.ideas.find(i=>i.num==='teacher'&&i.s===msx),q=$('svq')?$('svq').value.split('\n').map(x=>x.trim()).filter(Boolean):[],o=$('svo')?$('svo').value.split('\n').map(x=>x.trim()).filter(Boolean):[],del=e.target.id==='svd';
+    if(!del&&!q.length)return toast('حداقل یک گویه بنویسید');
+    const r=await post(u,{a:'idea',key:k,num:'teacher',s:msx,text:svJoin(t?t.text:'',del?null:{q,o})});toast(r.err||(del?'فرم حذف شد':'فرم برای دانشجوها بارگذاری شد ✓'));await sync(true);return render();}
+  if(e.target.id==='mts'){const{u,k}=matCfg(),r=await post(u,{a:'idea',key:k,num:'teacher',s:msx,text:svJoin($('mt').value,((srv.ideas.find(i=>i.num==='teacher'&&i.s===msx)||{}).sv))});toast(r.err||'ذخیره شد ✓');await sync(true);return render();}
   const mxb=e.target.closest('[data-mx]');if(mxb){e.stopPropagation();if(!confirm('این فایل حذف شود؟'))return;const{u,k}=matCfg();await post(u,{a:'del',key:k,num:'teacher',id:mxb.dataset.mx});await sync(true);return render();}
   if(e.target.id==='bPlay'){const l=galList();return l.length?viewer(l,0):toast('کاری برای نمایش نیست');}
   const tl=e.target.closest('.gt3');
@@ -931,10 +985,10 @@ $('view').addEventListener('change',async e=>{
   const cd=e.target.closest('.card');if(!cd)return;const s=+cd.dataset.s;
   if(e.target.classList.contains('dn')){const r=rec(cur,s);r.done=e.target.checked;await saveRec(r);
     const st=students.find(x=>x.id===cur),u=(API||cfg.get('url',''));
-    if(u)post(u,{a:'done',key:cfg.get('key',''),num:st.num,s,done:r.done}).then(x=>{if(x.err)toast(x.err)}).catch(()=>toast('ثبت روی سرور ناموفق بود'));
+    if(u)post(u,{a:'done',key:cfg.get('key',''),num:st.num,s,done:r.done}).then(x=>{if(x.err)toast(x.err)}).catch(x=>toast('⚠️ ثبت روی سرور ناموفق بود: '+errTxt(x)));
     renderStudent();renderList();}
   if(e.target.classList.contains('note')){const r=rec(cur,s);r.note=e.target.value;await saveRec(r);const st=students.find(x=>x.id===cur),nu=(API||cfg.get('url',''));
-    if(nu)post(nu,{a:'note',key:cfg.get('key',''),list:[{num:st.num,s,text:r.note}]}).then(x=>x.err?toast(x.err):toast('یادداشت برای دانشجو ثبت شد ✓')).catch(()=>toast('ثبت یادداشت روی سرور ناموفق بود'));}
+    if(nu)post(nu,{a:'note',key:cfg.get('key',''),list:[{num:st.num,s,text:r.note}]}).then(x=>x.err?toast(x.err):toast('یادداشت برای دانشجو ثبت شد ✓')).catch(x=>toast('⚠️ ثبت یادداشت ناموفق بود: '+errTxt(x)));}
 });
 $('pm').onclick=e=>{if(e.target.id==='pm'){$('pm').classList.remove('on');$('pb').innerHTML='';}};
 $('pm').addEventListener('click',e=>{const n=e.target.closest('[data-vn]');if(n){VW.i+=+n.dataset.vn;drawV();}if(e.target.id==='vx'){$('pm').classList.remove('on');$('pb').innerHTML='';}});
@@ -962,7 +1016,7 @@ async function sync(q){
   if(!sync.r){sync.r=1;pushRoster();pushNotes(u);}
   try{const a=await post(u,{a:'all',key:cfg.get('key','')});if(a.err){if(/کلید/.test(a.err)){cfg.set('key','');location.replace(location.pathname+'?t=1');return}if(!q)toast(a.err);return;}
     if(a.n&&a.n!==N){setN(a.n);cfg.set('n',a.n);}
-    srv={files:a.files||[],ideas:a.ideas||[],done:a.done||[]};
+    srv={files:cleanF(a.files),ideas:svMap(a.ideas),done:a.done||[]};
     const best={};(a.votes||[]).forEach(v=>{if(v.rater===v.target||!(v.score>=1&&v.score<=5))return;const k=v.rater+'|'+v.s+'|'+v.target;if(!best[k]||v.t>=best[k].t)best[k]={...v,k};});
     await putMany('votes',Object.values(best));
     const byNum={};students.forEach(s=>byNum[s.num]=s);
@@ -970,7 +1024,7 @@ async function sync(q){
     await load();if(!(q&&document.activeElement&&document.activeElement.tagName==='TEXTAREA'))render();
     $('live').textContent='● به‌روز '+new Date().toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'});
     if(!q)toast(fa(a.files.length)+' فایل و '+fa(Object.keys(best).length)+' رأی دریافت شد ✓');
-  }catch(e){if(!q)toast('اتصال ناموفق بود؛ آدرس و دسترسی (Anyone) را بررسی کنید');}
+  }catch(e){if(!q)toast('⚠️ '+errTxt(e,'اتصال ناموفق بود؛ آدرس و دسترسی (Anyone) را بررسی کنید'));else $('live').textContent='○ آفلاین';}
 }
 function settings(){
   $('ff').innerHTML=`<h3 style="margin:0">⚙️ اتصال و تنظیمات</h3>
@@ -994,6 +1048,11 @@ const matCfg=()=>({u:(API||cfg.get('url','')),k:cfg.get('key','')});
 async function upMat(fs){const{u,k}=matCfg();UP.begin(fs.length);
   try{for(let i=0;i<fs.length;i++)await uploadWithPoster(u,{num:'teacher',key:k},fs[i],'material',msx,i);UP.end(true,'آپلود کامل شد 🎉');burst(document.body);}catch(x){UP.end(false,'آپلود ناموفق: '+x.message)}
   await sync(true);render();}
+function svPanel(s){const t=srv.ideas.find(i=>i.num==='teacher'&&i.s===s),df=t&&t.sv,R=srv.ideas.filter(i=>i.num!=='teacher'&&i.s===s&&i.sv&&i.sv.a);
+  const avg=i=>R.length?R.reduce((x,r)=>x+(r.sv.a[i]||0),0)/R.length:0;
+  const res=df&&R.length?`<div style="margin-top:10px"><b>📊 نتایج: ${fa(R.length)} پاسخ از ${fa(students.length)} دانشجو</b>${df.q.map((q,i)=>`<div class="lb" style="display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--bd,#ddd);padding:4px 0"><span>${esc(q)}</span><b>${fa(avg(i))} از ۵</b></div>`).join('')}${(df.o||[]).map((o,i)=>`<div class="lb">${esc(o)}: <b>${fa(R.filter(r=>(r.sv.o||[]).includes(i)).length)}</b> نفر</div>`).join('')}<button class="btn" id="svc" style="margin-top:6px">📋 کپی نتایج برای جدول</button></div>`:(df?'<small class="lb">هنوز پاسخی ثبت نشده است</small>':'');
+  return `<div class="sr"><b>📋 فرم نظرسنجی ${sname(s)}</b><small class="lb">هر خط یک گویه (مقیاس ۱ تا ۵)</small><textarea id="svq" rows="6" placeholder="هر خط یک گویه">${esc(df?df.q.join('\n'):'')}</textarea><small class="lb">گزینه‌های «کدام بخش مفید بود؟» (هر خط یک گزینه، اختیاری)</small><textarea id="svo" rows="4">${esc(df?(df.o||[]).join('\n'):'')}</textarea>
+  <div class="row"><button class="btn" id="svt">📄 قالب آماده</button><button class="btn pri" id="svp">بارگذاری فرم برای دانشجوها</button>${df?'<button class="btn dng" id="svd">حذف فرم</button>':''}</div>${res}</div>`}
 function renderMaterials(){
   const{u,k}=matCfg();
   if(!u||!k){$('view').innerHTML='<div class="empty">ابتدا آدرس اتصال و کلید معلم را در ⚙️ تنظیمات وارد کنید.<br><br><button class="btn pri" id="bSet2">⚙️ باز کردن تنظیمات</button></div>';return;}
@@ -1002,7 +1061,7 @@ function renderMaterials(){
       <span class="sp"></span><div class="kpi"><div><b>${cu(srv.files.filter(f=>f.kind==='material').length)}</b><small>فایل در کل</small></div><div><b>${cu(sessions().filter(has).length)}</b><small>جلسه دارای مطلب</small></div></div></div>
     <div class="reel">${sessions().map(x=>`<button class="rl ${x===s?'on':''}" data-ms="${x}" style="--q:${has(x)?1:0}">${fa(x)}<i></i></button>`).join('')}</div>
     <div class="mwrap"><div class="sr"><b>✍️ توضیح / خلاصهٔ درس — ${sname(s)}</b><textarea id="mt" rows="6" placeholder="توضیح/خلاصهٔ درس این جلسه…">${esc(t?t.text:'')}</textarea><button class="btn pri" id="mts">ذخیره توضیح</button></div>
-      <div class="sr"><b>📎 فایل‌های ${sname(s)}</b><label class="stg emp upz"><span class="fl">📤</span><b>فایل را اینجا رها کنید یا کلیک کنید</b><small>PDF، ویدئو، تصویر، اسلاید …</small><input type="file" id="mf" multiple hidden></label></div></div>
+      ${svPanel(s)}<div class="sr"><b>📎 فایل‌های ${sname(s)}</b><label class="stg emp upz"><span class="fl">📤</span><b>فایل را اینجا رها کنید یا کلیک کنید</b><small>PDF، ویدئو، تصویر، اسلاید …</small><input type="file" id="mf" multiple hidden></label></div></div>
     ${L.length?`<div class="mgrid mg2">${L.map(f=>`<div class="mc" data-m="${f.id}">${cover(f,520)}${isVid(f)?'<span class="stg-pl"><i>▶</i></span>':''}<span class="mcl">${esc(f.name)}</span><button class="stg-x" data-mx="${f.id}" title="حذف">×</button></div>`).join('')}</div>`:'<div class="empty">هنوز فایلی برای این جلسه نگذاشته‌اید</div>'}`;
 }
 function guide(){$('ff').innerHTML=`<h3 style="margin:0">❓ روند کار</h3><ol class="gd">
@@ -1026,7 +1085,7 @@ $('bCsv').onclick=()=>{
     sessions().forEach(s=>{const r=rec(st.id,s),pa=peerAvg(st.id,s),x=score(st.id,s);
       row.push(r.done?'بله':'خیر',r.rating?LV[r.rating][0]+' ('+r.rating+')':'',pa==null?'':pa.toFixed(2),x==null?'':x.toFixed(2));});
     const t=stats(st.id);row.push(t.tot.toFixed(2),t.avg==null?'':t.avg.toFixed(2));return row;})];
-  dl('class-report.csv',new Blob(['\ufeff'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}));
+  dl('class-report.csv',new Blob(['\ufeff'+rows.map(r=>r.map(c=>{c=String(c);if(/^[=+\-@]/.test(c))c="'"+c;return '"'+c.replace(/"/g,'""')+'"'}).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}));
 };
 $('bBak').onclick=async()=>{
   const d={v:2,students:await all('students'),records:await all('records'),votes:await all('votes'),media:(await all('media')).map(m=>({k:m.k,name:m.name,type:m.blob.type}))};
@@ -1062,7 +1121,7 @@ function tLogin(msg){document.body.className='stu';
   document.body.innerHTML=`<div class="sw"><div class="hero"><span class="lg">${LOGO.replace(/36/g,'72')}</span><h1>ورود استاد</h1></div>
   <div class="sr"><b>🎓 پنل استاد</b>${API?'':`<input id="tu" class="t" dir="ltr" placeholder="آدرس Web app (https://script.google.com/macros/s/…/exec)" value="${esc(cfg.get('url',''))}">`}
   <input id="tk" class="t" type="password" dir="ltr" placeholder="کلید معلم (TEACHER_KEY)" value="${esc(cfg.get('key',''))}">
-  <button class="btn pri big" id="tg">ورود ✨</button><div class="lb" id="te" style="color:var(--danger)">${msg||''}</div></div><a class="tlink" href="?s=1">🎒 ورود دانشجو</a></div><div id="toast"></div>`;
+  <button class="btn pri big" id="tg">ورود ✨</button><div class="lb" id="te" style="color:var(--danger)">${esc(msg||'')}</div></div><a class="tlink" href="?s=1">🎒 ورود دانشجو</a></div><div id="toast"></div>`;
   const go=async()=>{const url=API||$('tu').value.trim(),key=$('tk').value.trim(),te=$('te');if(!url||!key)return te.textContent='آدرس و کلید را وارد کنید';
     $('tg').disabled=true;te.textContent='در حال بررسی…';
     try{const r=await post(url,{a:'all',key});if(r.err){$('tg').disabled=false;return te.textContent=r.err}
