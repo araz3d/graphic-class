@@ -461,6 +461,23 @@ a[data-vplay] .pl{font-size:26px}
 .idea>.btn a[data-vplay]{display:block!important;width:100%}
 .idea>.btn a[data-vplay] img{width:100%!important;height:auto!important;aspect-ratio:1;border-radius:14px!important}
 .idea>.btn:has(a[data-vplay]),.fm .thumbs>.btn:has(a[data-vplay]){grid-column:auto!important;justify-self:auto!important}
+/* ===== v12 · سبک و جزئیات صحنه ===== */
+.opx{border-top:4px solid #f59e0b}
+.ogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.ogrid label,.opx>label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:700;color:var(--mute)}
+.ogrid select,.opx input{padding:9px 10px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:14px;color:var(--ink);font-weight:400}
+.ogrid select:focus,.opx input:focus{border-color:var(--brand)}
+.stl{display:flex;gap:6px;flex-wrap:wrap;padding:2px 0 4px}
+.stl button{flex:none;scroll-snap-align:start;border:1px solid var(--line);background:var(--card);border-radius:99px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s}
+.stl button.on{background:linear-gradient(120deg,#6c47ff,#ec2f8c);color:#fff;border-color:transparent;transform:translateY(-2px)}
+.sbj{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12.5px}
+.sbj span{background:color-mix(in srgb,#12a150 12%,var(--card));border:1px solid color-mix(in srgb,#12a150 40%,var(--line));border-radius:99px;padding:2px 10px}
+.sbj span i{font-style:normal;direction:ltr;unicode-bidi:isolate;color:var(--mute)}
+/* ===== v14 · سایت‌های ویدئو و حفظ وضعیت ===== */
+.vsl{display:flex;gap:6px;flex-wrap:wrap}
+.vsl button{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:8px 12px;cursor:pointer;font-weight:700;font-size:13px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:right;transition:.2s}
+.vsl button small{font-weight:400;font-size:11px;color:var(--mute)}
+.vsl button.on{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 12%,var(--card));box-shadow:0 0 0 2px color-mix(in srgb,var(--brand) 35%,transparent)}
 </style>
 </head>
 <body>
@@ -700,7 +717,7 @@ function student(){
   async function refresh(){const r=await post(u,{a:'student',num:D.num});if(!r.err){if(r.n)setN(r.n);D=svIn({...r,files:cleanF(r.files),num:D.num});loadSc();}}
   async function enter(n){n=norm(n);if(!u)return login('آدرس سرور تنظیم نشده؛ به استاد اطلاع بدهید');
     shell('<div class="empty">در حال ورود…</div>');
-    try{const r=await post(u,{a:'student',num:n});if(r.err)return login(r.err);cfg.set('num',n);if(r.n)setN(r.n);D=svIn({...r,files:cleanF(r.files),num:n});loadSc();vResume();tab='home';view();if(!r.n)setTimeout(()=>toast('⚠️ نسخهٔ سرور قدیمی است؛ به استاد بگو Code.gs را دوباره Deploy کند'),900);}catch(e){login(errTxt(e,'اتصال برقرار نشد؛ اینترنت را بررسی کنید'))}}
+    try{const r=await post(u,{a:'student',num:n});if(r.err)return login(r.err);cfg.set('num',n);if(r.n)setN(r.n);D=svIn({...r,files:cleanF(r.files),num:n});loadSc();vResume();tab='home';if(!uiRestore())view();if(!r.n)setTimeout(()=>toast('⚠️ نسخهٔ سرور قدیمی است؛ به استاد بگو Code.gs را دوباره Deploy کند'),900);}catch(e){login(errTxt(e,'اتصال برقرار نشد؛ اینترنت را بررسی کنید'))}}
   const mine=(k,s)=>D.files.filter(f=>f.num===D.num&&f.s===s&&f.kind===k);
   const dn=()=>{const o={};for(let s=1;s<=N;s++)o[s]=D.done.includes(s);return o};
   const chips=(cur,f,g)=>`<div class="chips" id="cc">${Array.from({length:N},(_,i)=>i+1).map(s=>`<button data-s="${s}" class="${s===cur?'on':''} ${f(s)?'d':''} ${g&&g(s)?'n':''}">${fa(s)}</button>`).join('')}</div>`;
@@ -749,31 +766,67 @@ function student(){
     $('pb').innerHTML=`<div class="fm"><h3 style="margin:0">💡 ایدهٔ ${sname(cs)}</h3>
       <textarea id="idt" rows="6" class="t" placeholder="ایده‌ات را اینجا بنویس…">${esc(idea?idea.text:'')}</textarea><button class="btn pri" id="ids">ذخیره متن ایده</button>
       <div class="lb" style="text-align:center">— یا —</div>
+      ${optPanel()}
       <div class="sr" style="margin:0"><b>🎨 تصویرسازی سینمایی با هوش مصنوعی</b><small>روش ۱: فقط ایده را در کادر بالا بنویس تا خودکار به ۴ پلان سینمایی تبدیل شود. روش ۲: پلان‌هایت را کامل بنویس (فضا، دوربین، نور، متریال، رنگ) و هر پلان را با یک خط خالی جدا کن؛ تصویر دقیقاً همان را می‌سازد (تا ۴ پلان). متن روی تصویر ساخته نمی‌شود.</small>
         <textarea id="aip" rows="5" class="t" placeholder="پلان‌های دلخواه (اختیاری)&#10;&#10;پلان ۱: نمای باز، سحرگاه، مه سبک، لنز ۲۴ میلی‌متر…&#10;&#10;پلان ۲: …"></textarea>
-        <select id="ais" class="t"><option value="cinematic">🎬 سینمایی و رئال</option><option value="product">📷 عکاسی تبلیغاتی / محصول</option><option value="concept">🎨 کانسپت آرت</option><option value="sketch">✏️ استوری‌بورد خطی</option></select>
-        <button class="btn pri" id="aib" type="button">🎬 ساخت تصاویر</button><div class="lb" id="aist"></div></div>
+         <button class="btn pri" id="aib" type="button">🎬 ساخت تصاویر</button><div class="lb" id="aist"></div><div id="aisb">${subjHtml(((D.vprompts||[]).find(x=>x.s===cs)||{}).subj)}</div></div>
       <div id="vbox">${vBox()}</div>
       <div class="rec" id="rbox"><button class="btn pri" id="rec" type="button">🎙️ ضبط صدا با میکروفون</button></div>
       <label class="btn upl">📎 آپلود فایل (PDF / DOC / TXT / صوتی از گوشی یا سیستم)<input type="file" id="fi" accept=".pdf,.doc,.docx,.txt,audio/*" hidden></label><div class="pg" id="pg" hidden><i></i></div>
       <div class="thumbs" id="idth">${idf.map(f=>`<span class="btn" style="display:inline-flex;gap:8px">${idLink(f)}<b data-del="${f.id}" style="cursor:pointer;color:var(--danger)">×</b></span>`).join('')}</div>
-      <button class="btn" id="cls">بستن</button></div>`;$('pm').classList.add('on');}
+      <button class="btn" id="cls">بستن</button></div>`;$('pm').classList.add('on');
+    const dr=drLoad();if(dr){if(dr.idt&&$('idt')&&dr.idt!==$('idt').value)$('idt').value=dr.idt;if(dr.aip&&$('aip'))$('aip').value=dr.aip}uiSave('idea');}
+  /* ===== حفظ وضعیت: برگشت به همان صفحه و همان نقطه ===== */
+  const uiSave=m=>{try{const pb=$('pb'),open=$('pm')&&$('pm').classList.contains('on')&&$('idt');cfg.set('ui',JSON.stringify({num:D&&D.num,tab,cs,modal:m!=null?m:(open?'idea':''),y:open&&pb?pb.scrollTop:0,t:Date.now()}))}catch(e){}};
+  const drKey=()=>'drf_'+(D&&D.num)+'_'+cs;
+  const drSave=()=>{const a=$('idt'),b=$('aip');if(a||b)cfg.set(drKey(),JSON.stringify({idt:a?a.value:'',aip:b?b.value:'',t:Date.now()}))};
+  const drLoad=()=>{try{return JSON.parse(cfg.get(drKey(),'null'))}catch(e){return null}};
+  function uiRestore(){let u2=null;try{u2=JSON.parse(cfg.get('ui','null'))}catch(e){}
+    if(!u2||u2.num!==D.num||Date.now()-u2.t>6*3600000||!['home','tasks','rate','mat'].includes(u2.tab))return false;
+    tab=u2.tab;if(u2.cs>=1&&u2.cs<=N)cs=u2.cs;view();if(u2.modal==='idea'&&tab==='tasks'){ideaModal();setTimeout(()=>{const pb=$('pb');if(pb)pb.scrollTop=u2.y||0},60)}return true}
+  addEventListener('pagehide',()=>{if(D){drSave();uiSave()}});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&D){drSave();uiSave()}});
+  document.addEventListener('input',e=>{if(e.target&&(e.target.id==='idt'||e.target.id==='aip'))drSave()});
+  let _sy=0;document.addEventListener('scroll',e=>{if(e.target&&e.target.id==='pb'&&Date.now()-_sy>400){_sy=Date.now();uiSave()}},true);
+  /* ===== سبک و جزئیات صحنه (مشترک برای تصویر و ویدئو) ===== */
+  const OPTS={st:[['cinematic','🎬 سینمایی و رئال'],['classic','🎞️ کلاسیک'],['noir','⚫ سیاه‌وسفید نوآر'],['fantasy','🧚 فانتزی'],['surreal','🌀 سورئال'],['pixar3d','🧸 سه‌بعدی (سبک پیکسار/دیزنی)'],['cartoon2d','✏️ انیمیشن دوبعدی'],['anime','🌸 انیمه'],['sketch','📝 اسکیس / استوری‌بورد'],['watercolor','🖌️ آبرنگ / نقاشی'],['clay','🧱 استاپ‌موشن خمیری'],['product','📷 تبلیغاتی محصول'],['concept','🎨 کانسپت آرت'],['cyber','🌃 نئون / سایبرپانک'],['motion','🔷 موشن‌گرافیک مینیمال']],
+    cm:[['auto','✨ خودکار (متنوع)'],['static','دوربین ثابت'],['dolly_in','حرکت آرام رو به جلو'],['dolly_out','عقب‌کشیدن آرام'],['pan','پن افقی'],['tilt','تیلت رو به بالا'],['orbit','چرخش دور سوژه'],['crane','بالا رفتن کرین'],['track','دنبال‌کردن سوژه'],['handheld','دوربین روی دست'],['drone','نمای هوایی پهپاد'],['zoom','زوم آرام'],['fpv','پرواز سریع FPV'],['slowmo','حرکت آهسته']],
+    lt:[['auto','✨ خودکار'],['soft','نور طبیعی نرم'],['golden','ساعت طلایی'],['blue','گرگ‌ومیش'],['night','شب مهتابی'],['high','پرنور (High key)'],['low','دراماتیک کم‌نور'],['neon','نئون'],['rim','نور پشت و لبه'],['god','پرتوهای حجمی'],['candle','نور شمع'],['studio','استودیویی']],
+    at:[['auto','✨ خودکار'],['clear','هوای صاف'],['fog','مه'],['rain','باران'],['snow','برف'],['dust','گرد و غبار'],['wind','باد'],['dream','ذرات رؤیایی']],
+    md:[['auto','✨ خودکار'],['calm','آرام'],['joy','شاد و بازیگوش'],['epic','حماسی'],['myst','رازآلود'],['rom','عاشقانه و لطیف'],['tense','پرتنش'],['nost','نوستالژیک'],['whim','خیال‌انگیز']],
+    ar:[['16:9','افقی ۱۶:۹'],['9:16','عمودی ۹:۱۶ (ریلز)'],['1:1','مربع ۱:۱']],du:[['5','۵ ثانیه'],['10','۱۰ ثانیه']]};
+  const getOpt=()=>{let o={};try{o=JSON.parse(cfg.get('opt','{}'))||{}}catch(e){}const d={st:'cinematic',cm:'auto',lt:'auto',at:'auto',md:'auto',ar:'16:9',du:'5',ch:''};o.lock=o.lock!==false;const lk=document.querySelector('[data-opt="lock"]');if(lk)o.lock=lk.checked;
+    for(const k in d){if(k!=='ch'&&!(OPTS[k]||[]).some(x=>x[0]===o[k]))o[k]=d[k]}const ce=document.querySelector('[data-opt="ch"]');o.ch=String(ce?ce.value:o.ch||'').slice(0,200);
+    document.querySelectorAll('select[data-opt]').forEach(x=>{if(OPTS[x.dataset.opt].some(y=>y[0]===x.value))o[x.dataset.opt]=x.value});return o};
+  const setOpt=(k,v)=>{const o=getOpt();o[k]=k==='lock'?!!v:v;cfg.set('opt',JSON.stringify(o))};
+  const sel=(k,lbl,o)=>`<label>${lbl}<select data-opt="${k}">${OPTS[k].map(([v,t])=>`<option value="${v}" ${o[k]===v?'selected':''}>${t}</option>`).join('')}</select></label>`;
+  function optPanel(){const o=getOpt();
+    return `<div class="sr opx" style="margin:0"><b>🎛️ سبک و جزئیات صحنه</b><small>برای تصاویر و پرامپت‌های ویدئو. «خودکار» یعنی هوش مصنوعی برای هر پلان بهترین را انتخاب کند. انتخاب‌ها برای دفعهٔ بعد هم یادت می‌ماند.</small>
+      <label>🧸 کاراکتر یا سوژهٔ اصلی (برای دقت بیشتر)<input data-opt="ch" maxlength="200" value="${esc(o.ch)}" placeholder="مثلاً: خرس قهوه‌ای کوچک با شال قرمز (می‌توانی انگلیسی هم بنویسی: little brown bear)"></label>
+      <div><small class="lb">🎨 سبک بصری</small><div class="stl">${OPTS.st.map(([v,t])=>`<button type="button" data-ost="${v}" class="${o.st===v?'on':''}">${t}</button>`).join('')}</div></div>
+      <label class="chk" style="flex-direction:row;font-size:13.5px;color:var(--ink)"><input type="checkbox" data-opt="lock" ${o.lock?'checked':''}> 🔒 یکپارچگی کاراکتر: اول یک «کاراکتر مرجع» ساخته می‌شود و همهٔ پلان‌ها از روی همان ساخته می‌شوند</label>
+      <div class="ogrid">${sel('cm','🎥 حرکت دوربین',o)}${sel('lt','💡 نورپردازی',o)}${sel('at','🌫️ فضا و جو',o)}${sel('md','🎭 حس و حال',o)}${sel('ar','📐 قاب',o)}${sel('du','⏱️ مدت هر پلان',o)}</div></div>`}
+  const refOf=s=>{let b=null;D.files.forEach(f=>{if(f.num===D.num&&f.s===s&&f.kind==='idea'&&/-ref\.(jpg|png)$/.test(f.name||'')&&(!b||f.t>b.t))b=f});return b};
+  const charHtml=(bible,ref)=>bible?`<div class="sbj" style="align-items:flex-start;margin-top:6px">${ref?`<a href="${DR.view(ref.id)}" data-img="${esc(ref.id)}"><img src="${DR.th(ref.id,240)}" alt="" style="width:72px;height:72px;object-fit:cover;border-radius:12px;display:block"></a>`:''}<div><b>🧸 کاراکتر ثابت همهٔ پلان‌ها:</b><div style="direction:ltr;text-align:left;font-size:12px;color:var(--mute);line-height:1.6">${esc(bible)}</div></div></div>`:'';
+  const subjHtml=sb=>sb&&sb.length?`<div class="sbj"><b>🔎 سوژه‌هایی که هوش مصنوعی فهمید:</b>${sb.map(x=>`<span>${esc(x.fa)} ← <i>${esc(x.en)}</i></span>`).join('')}</div><small class="lb">اگر سوژه‌ای اشتباه فهمیده شده، آن را در «کاراکتر یا سوژهٔ اصلی» دقیق (یا به انگلیسی) بنویس و دوباره بساز.</small>`:'';
   /* ===== پرامپت ویدئو + ساخت ویدئو ===== */
   const VJ={};
   const vpOf=s=>((D.vprompts||[]).find(x=>x.s===s)||{}).p||[];
-  const planImgOf=(s,i)=>{let b=null;const re=new RegExp('^AI-s'+s+'-\\d+-'+(i+1)+'\\.jpg$');D.files.forEach(f=>{if(f.num===D.num&&f.s===s&&f.kind==='idea'&&re.test(f.name||'')&&(!b||f.t>b.t))b=f});return b};
+  const planImgOf=(s,i)=>{let b=null;const re=new RegExp('^AI-s'+s+'-\\d+-'+(i+1)+'\\.(jpg|png)$');D.files.forEach(f=>{if(f.num===D.num&&f.s===s&&f.kind==='idea'&&re.test(f.name||'')&&(!b||f.t>b.t))b=f});return b};
   const planVidOf=(s,i)=>{let b=null;const re=new RegExp('^AIV-s'+s+'-\\d+-'+(i+1)+'\\.mp4$');D.files.forEach(f=>{if(f.num===D.num&&f.s===s&&f.kind==='idea'&&re.test(f.name||'')&&(!b||f.t>b.t))b=f});return b};
   const mmss=ms=>{const q=Math.max(0,Math.floor(ms/1000));return fa(Math.floor(q/60))+':'+(q%60<10?'۰':'')+fa(q%60)};
-  const FREE=[['https://klingai.com','Kling','اعتبار رایگان روزانه'],['https://hailuoai.video','Hailuo','اعتبار رایگان روزانه'],['https://app.pixverse.ai','PixVerse','اعتبار رایگان روزانه'],['https://dreamina.capcut.com','Dreamina','اعتبار رایگان']];
+  const FREE0=[['https://klingai.com','Kling','کار می‌کند ولی صف طولانی؛ شروع کن و بعداً سر بزن'],['https://fal.ai/grok-imagine-free','Grok Imagine (fal)','۵ ویدئوی رایگان در روز؛ از روی تصویر پلان'],['https://www.meta.ai','Meta AI','رایگان با محدودیت؛ ورود با اینستاگرام یا فیسبوک'],['https://chat.qwen.ai','Qwen Chat','حدود یک ویدئوی رایگان در روز'],['https://lumalabs.ai/dream-machine','Luma','چند ویدئوی رایگان']];
+  const FREE=()=>(D.vsites&&D.vsites.length?D.vsites:FREE0);
+  const site=()=>{const f=FREE(),k=cfg.get('vsite','');return f.find(x=>x[0]===k)||f[0]};
   function vStat(i){const j=VJ[cs+'|'+i];if(!j)return '';if(j.err)return `<span style="color:var(--danger)">⚠️ ${esc(j.err)}</span>`;
     return `⏳ در حال ساخت ویدئو… ${mmss(Date.now()-j.t0)} <small class="lb">(معمولاً ۱ تا ۴ دقیقه؛ می‌توانی پنجره را ببندی)</small>`}
   function vBox(){const p=vpOf(cs);
     return `<div class="sr vbx" style="margin:0"><b>🎬 پرامپت ویدئو برای هر پلان</b>
       <small>از ایده و پلان‌های بالا، برای هر پلان یک پرامپت ویدئو ساخته می‌شود: <b>انگلیسی</b> (برای سایت‌های هوش مصنوعی) و <b>فارسی</b> (برای فهم خودت)، با شمارهٔ پلان، حرکت دوربین، نور و فضا. اگر تصویر پلان را ساخته باشی، ویدئو می‌تواند از همان تصویر شروع شود.</small>
-      <button class="btn pri" id="vpb" type="button">✨ ${p.length?'ساخت دوبارهٔ':'ساخت'} پرامپت‌های ویدئو</button><div class="lb" id="vpst"></div>
-      ${p.length?`<div class="vpr"><button class="btn" data-vall="1" type="button">📋 کپی همهٔ پلان‌ها</button></div>`+p.map((o,i)=>{const im=planImgOf(cs,i),vd=planVidOf(cs,i),run=VJ[cs+'|'+i]&&!VJ[cs+'|'+i].err;
+      <button class="btn pri" id="vpb" type="button">✨ ${p.length?'ساخت دوبارهٔ':'ساخت'} پرامپت‌های ویدئو</button><div class="lb" id="vpst"></div>${subjHtml(((D.vprompts||[]).find(x=>x.s===cs)||{}).subj)}
+      ${p.length?`<div class="vpr"><button class="btn" data-vall="1" type="button">📋 کپی همهٔ پلان‌ها</button><button class="btn" data-vshare="1" type="button">📤 فرستادن به تلگرام / پیام‌رسان</button></div><small class="lb">نکته: با «📤 فرستادن» پرامپت‌ها را مثلاً در Saved Messages تلگرام نگه دار تا در سایت ساخت ویدئو همیشه دمِ دستت باشند.</small>`+p.map((o,i)=>{const im=planImgOf(cs,i),vd=planVidOf(cs,i),run=VJ[cs+'|'+i]&&!VJ[cs+'|'+i].err;
         return `<div class="vpc"><div class="vph"><b>🎞️ پلان ${fa(i+1)}</b>${im?`<a href="${DR.view(im.id)}" data-img="${esc(im.id)}" title="تصویر پلان (برای Image to Video دانلود کن)"><img src="${DR.th(im.id,200)}" alt=""></a>`:''}</div>
-          <div class="vpt en">${esc(o.en)}</div><div class="vpr"><button class="btn" data-vcp="en|${i}" type="button">📋 کپی انگلیسی</button></div>
+          <div class="vpt en">${esc(o.en)}</div><div class="vpr"><button class="btn pri" data-vgoto="${i}" type="button">🚀 کپی و رفتن به ${esc(site()[1])}</button><button class="btn" data-vcp="en|${i}" type="button">📋 کپی انگلیسی</button>${im?`<a class="btn" href="https://drive.google.com/uc?export=download&id=${esc(im.id)}" target="_blank" rel="noopener">⬇ تصویر پلان</a>`:''}</div>
           ${o.fa?`<div class="vpt">${esc(o.fa)}</div><div class="vpr"><button class="btn" data-vcp="fa|${i}" type="button">📋 کپی فارسی</button></div>`:''}
           ${D.vid?`<div class="vpr"><button class="btn pri" data-vgo="${i}" type="button" ${run?'disabled':''}>🎥 ${vd?'ساخت دوبارهٔ':'ساخت'} ویدئوی این پلان</button>${vd?vidLink(vd).replace('<img ','<img style="width:72px;height:48px" '):''}</div>`:''}
           <div class="vst" id="vst${i}">${vStat(i)}</div></div>`}).join(''):''}
@@ -781,13 +834,15 @@ function student(){
     <div class="sr" style="margin:0"><b>🎥 ساخت ویدئو با هوش مصنوعی</b>
       ${D.vid?`<small>دکمهٔ «🎥 ساخت ویدئوی این پلان» را بزن؛ ویدئو خودکار ساخته و همین‌جا (و در Drive کلاس) ذخیره می‌شود. حداکثر ۴ ویدئو در هر جلسه.</small><small><b>یا</b> با کیفیت بالاتر در سایت‌های رایگان:</small>`:''}
       <small>۱) پرامپت <b>انگلیسی</b> پلان را کپی کن ۲) در یکی از این سایت‌ها بچسبان (اگر تصویر پلان را داری، روی آن بزن، ⬇ دانلود کن و در حالت <b>Image to Video</b> به‌عنوان فریم اول بده) ۳) ویدئو را دانلود کن و در «📁 تکلیف من» با «🎬 افزودن ویدئو» آپلود کن.</small>
-      <div class="vfl">${FREE.map(([h,n,t])=>`<a href="${h}" target="_blank" rel="noopener">${n}<small>${t}</small></a>`).join('')}</div></div>`}
+      <small><b>سایت دلخواهت را انتخاب کن</b>؛ بعد دکمهٔ «🚀 کپی و رفتن» هر پلان، پرامپت را کپی و همان سایت را باز می‌کند. وقتی برگشتی، همین صفحه سر جایش است.</small>
+      <div class="vsl">${FREE().map(([h,n,t])=>`<button type="button" data-vsite="${esc(h)}" class="${site()[0]===h?'on':''}">${esc(n)}<small>${esc(t)}</small></button>`).join('')}</div>
+      <div class="vpr"><button class="btn" data-vopen="1" type="button">↗ فقط باز کردن ${esc(site()[1])}</button></div></div>`}
   const vRedraw=()=>{if($('vbox'))$('vbox').innerHTML=vBox();if($('idth'))$('idth').innerHTML=mine('idea',cs).map(f=>`<span class="btn" style="display:inline-flex;gap:8px">${idLink(f)}<b data-del="${f.id}" style="cursor:pointer;color:var(--danger)">×</b></span>`).join('')};
   async function vpGen(b){const tx=$('idt').value.trim(),sh=($('aip').value||'').split(/\n\s*\n/).map(x=>x.trim()).filter(x=>x.length>=8).slice(0,4);
     if(!sh.length&&tx.length<8)return toast('اول ایده یا پلان‌هایت را بنویس');
     b.disabled=true;const st=$('vpst');if(st)st.textContent='🧠 در حال نوشتن پرامپت‌های ویدئو (انگلیسی و فارسی)…';
     try{if(tx.length>=8)await post(u,{a:'idea',num:D.num,s:cs,text:svJoin(tx,svMine())});
-      const r=await post(u,{a:'vprompt',num:D.num,s:cs,text:tx,shots:sh});if(r.err)throw new Error(r.err);
+      const r=await post(u,{a:'vprompt',num:D.num,s:cs,text:tx,shots:sh,opt:getOpt()});if(r.err)throw new Error(r.err);
       await refresh();vRedraw();burst($('vbox')||document.body);toast('پرامپت‌های ویدئو آماده شد 🎬')}
     catch(e){if($('vpst'))$('vpst').textContent='⚠️ '+e.message;b.disabled=false}}
   async function vidStart(i,b){if(b)b.disabled=true;const k=cs+'|'+i;
@@ -828,14 +883,14 @@ function student(){
       ${fs.length?`<div class="sr"><b>📎 فایل‌های ضمیمهٔ استاد</b><div class="mgrid">${fs.map(f=>`<button class="mc" data-m="${f.id}">${cover(f,520)}${isVid(f)?'<span class="stg-pl"><i>▶</i></span>':''}<span class="mcl">${esc(f.name)}</span></button>`).join('')}</div></div>`:''}`;const bx=$('app').querySelector('.mtxt'),tg=$('app').querySelector('[data-mtg]');if(bx&&tg&&bx.scrollHeight<=bx.clientHeight+6)tg.remove();}
   async function click(e){
     const t=e.target,go=t.closest('[data-go]');
-    if(go){tab=go.dataset.go;if(tab!=='home'){$('app').innerHTML='<div class="empty">⏳ در حال دریافت کارها…</div>';try{await refresh()}catch(x){}}view();return window.scrollTo(0,0);}
+    if(go){tab=go.dataset.go;setTimeout(()=>uiSave(''),0);if(tab!=='home'){$('app').innerHTML='<div class="empty">⏳ در حال دریافت کارها…</div>';try{await refresh()}catch(x){}}view();return window.scrollTo(0,0);}
     if(t.closest('[data-refresh]')){$('app').innerHTML='<div class="empty">⏳ در حال دریافت کارها…</div>';try{await refresh();toast('به‌روز شد ✓')}catch(x){toast('دریافت نشد؛ اینترنت را بررسی کنید')}return view();}
     if(t.id==='out'){cfg.set('num','');D=null;return login();}
     if(t.closest('[data-sv]'))return svModal();
     if(t.id==='svs')return svSave(t);
     if(t.closest('[data-idea]'))return ideaModal();
     if(t.closest('[data-av]'))return avModal();
-    if(t.id==='cls'){recStop();$('pm').classList.remove('on');$('pb').innerHTML='';return view();}
+    if(t.id==='cls'){recStop();drSave();$('pm').classList.remove('on');$('pb').innerHTML='';uiSave('');return view();}
     const ch=t.closest('.chips button');
     if(ch){const s=+ch.dataset.s;if(tab==='tasks'){cs=s;cfg.set('ses',s);}else if(tab==='mat')ms=s;else{rs=s;loadSc();}return view();}
     const del=t.closest('[data-del]');
@@ -850,8 +905,15 @@ function student(){
       return;}
     const b=t.closest('.seg button');
     if(b){const c=b.closest('.sr'),n=c.dataset.n,v=+b.dataset.v;sc[n]=sc[n]===v?0:v;if(sc[n])burst(b);c.querySelector('.seg').innerHTML=rateBtns(sc[n]);c.querySelector('.sl').innerHTML=rateLbl(sc[n]);return;}
+    const os=t.closest('[data-ost]');if(os){setOpt('st',os.dataset.ost);os.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===os));return}
     if(t.id==='aib')return aiGen(t);if(t.id==='vpb')return vpGen(t);
     const vg=t.closest('[data-vgo]');if(vg)return vidStart(+vg.dataset.vgo,vg);
+    const vgt=t.closest('[data-vgoto]');if(vgt){const o=vpOf(cs)[+vgt.dataset.vgoto];if(!o)return;const sx=site();uiSave();
+      try{navigator.clipboard.writeText(o.en)}catch(x){}window.open(sx[0],'_blank','noopener');toast('پرامپت پلان '+fa(+vgt.dataset.vgoto+1)+' کپی شد؛ در '+sx[1]+' Paste کن',4500);return}
+    const vsb=t.closest('[data-vsite]');if(vsb){cfg.set('vsite',vsb.dataset.vsite);vRedraw();return}
+    if(t.closest('[data-vopen]')){uiSave();window.open(site()[0],'_blank','noopener');return}
+    if(t.closest('[data-vshare]')){const txt=vpOf(cs).map((o,i)=>'🎞️ پلان '+(i+1)+'\n'+o.en+(o.fa?'\n\n'+o.fa:'')).join('\n\n———\n\n');
+      if(navigator.share)navigator.share({title:'پرامپت‌های ویدئو · '+sname(cs),text:txt}).catch(()=>{});else copy(txt);return}
     const vc=t.closest('[data-vcp]');if(vc){const[l,i]=vc.dataset.vcp.split('|'),o=vpOf(cs)[+i];if(o)copy(o[l]);return}
     if(t.closest('[data-vall]')){copy(vpOf(cs).map((o,i)=>'پلان '+(i+1)+'\nEN: '+o.en+(o.fa?'\nFA: '+o.fa:'')).join('\n\n'));return}if(t.id==='rec')return recStart();if(t.id==='rcs')return recStop();if(t.id==='rcu')return recSend();
     if(t.id==='ids'){const r=await post(u,{a:'idea',num:D.num,s:cs,text:svJoin($('idt').value,svMine())});if(r.err)return toast(r.err);burst(t);toast('ایده ذخیره شد ✓');await refresh();return;}
@@ -869,18 +931,20 @@ function student(){
       MI=setInterval(()=>{const q=Math.floor((Date.now()-MT)/1000),z=q%60;if($('rtm'))$('rtm').textContent=fa(Math.floor(q/60))+':'+(z<10?'۰':'')+fa(z);if(q>=300)recStop();},500);
     }catch(err){toast('دسترسی به میکروفون داده نشد')}}
   function recStop(){if(MR&&MR.state==='recording')MR.stop();}
-  async function aiGen(b){const tx=$('idt').value.trim(),sh=($('aip').value||'').split(/\n\s*\n/).map(x=>x.trim()).filter(x=>x.length>=8).slice(0,4),sty=$('ais').value;
+  async function aiGen(b){const tx=$('idt').value.trim(),sh=($('aip').value||'').split(/\n\s*\n/).map(x=>x.trim()).filter(x=>x.length>=8).slice(0,4),opt=getOpt();
     if(!sh.length&&tx.length<8)return toast('ایده یا پلان‌هایت را کمی کامل‌تر بنویس');
     b.disabled=true;const set=t=>{const e=$('aist');if(e)e.textContent=t};
     try{if(tx.length>=8)await post(u,{a:'idea',num:D.num,s:cs,text:svJoin(tx,svMine())});set('🧠 در حال طراحی پلان‌های سینمایی…');
-      const p=await post(u,{a:'aiplan',num:D.num,s:cs,text:tx,shots:sh});if(p.err)throw new Error(p.err);
-      for(let i=0;i<p.prompts.length;i++){set('🎬 ساخت پلان '+fa(i+1)+' از '+fa(p.prompts.length)+' … (چند ثانیه)');const r=await post(u,{a:'aiimg',num:D.num,s:cs,i,prompt:p.prompts[i],style:sty});if(r.err)throw new Error(r.err);}
-      burst(b);toast('تصاویر آماده شد 🎉');await refresh();ideaModal();}
+      const p=await post(u,{a:'aiplan',num:D.num,s:cs,text:tx,shots:sh,opt});if(p.err)throw new Error(p.err);if($('aisb'))$('aisb').innerHTML=subjHtml(p.subjects)+charHtml(p.character);
+      if(opt.lock&&p.character){set('🧸 در حال طراحی کاراکتر مرجع (برای یکسان ماندن در همهٔ پلان‌ها)…');const rf=await post(u,{a:'aiimg',num:D.num,s:cs,i:0,ref:'make',opt});if(rf.err)throw new Error(rf.err);
+        if(rf.ref){await refresh();if($('aisb'))$('aisb').innerHTML=subjHtml(p.subjects)+charHtml(p.character,refOf(cs))}}
+      for(let i=0;i<p.prompts.length;i++){set('🎬 ساخت پلان '+fa(i+1)+' از '+fa(p.prompts.length)+' … (چند ثانیه)');const r=await post(u,{a:'aiimg',num:D.num,s:cs,i,prompt:p.prompts[i],opt,lock:opt.lock});if(r.err)throw new Error(r.err);}
+      burst(b);toast('تصاویر آماده شد 🎉');set('');b.disabled=false;await refresh();vRedraw();}
     catch(e){set('⚠️ '+e.message);b.disabled=false;}}
   async function recSend(){if(!MB)return;const ext=/mp4/.test(MB.type)?'m4a':'webm',f=new File([MB],'voice-s'+cs+'.'+ext,{type:MB.type.split(';')[0]});MB=null;UP.begin(1);
     try{await uploadFile(u,{num:D.num},f,'idea',cs,0);UP.end(true,'صدای ایده ارسال شد 🎙️');burst(document.body);await refresh();ideaModal();}catch(err){UP.end(false,'ارسال ناموفق: '+err.message)}}
   async function change(e){
-    const id=e.target.id;
+    const id=e.target.id,ok=e.target.dataset&&e.target.dataset.opt;if(ok){setOpt(ok,ok==='lock'?e.target.checked:e.target.value);return}
     if(id==='fav1'||id==='fav2'){const f=e.target.files[0];if(!f)return;UP.begin(1);
       try{let b;try{b=await squareJpeg(f)}catch(x){if(/^image\/(jpeg|png|webp)$/.test(f.type)&&f.size<8e6)b=f;else throw new Error('این فرمت عکس (مثلاً HEIC) خوانده نشد؛ در تنظیمات دوربین فرمت JPEG/«سازگارترین» را بگذار')}await uploadFile(u,{num:D.num},new File([b],'avatar.jpg',{type:b.type||'image/jpeg'}),'avatar',0,0);UP.end(true,'عکس پروفایل ذخیره شد ✨');burst(document.body);await refresh();$('pm').classList.remove('on');$('pb').innerHTML='';view();}
       catch(err){UP.end(false,'ناموفق: '+err.message)}return;}
