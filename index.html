@@ -478,6 +478,21 @@ a[data-vplay] .pl{font-size:26px}
 .vsl button{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:8px 12px;cursor:pointer;font-weight:700;font-size:13px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:right;transition:.2s}
 .vsl button small{font-weight:400;font-size:11px;color:var(--mute)}
 .vsl button.on{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 12%,var(--card));box-shadow:0 0 0 2px color-mix(in srgb,var(--brand) 35%,transparent)}
+/* ===== v15 · Google Flow و نتایج پلان‌ها ===== */
+.vmd{display:flex;gap:6px;background:var(--bg);padding:4px;border-radius:14px;border:1px solid var(--line)}
+.vmd button{flex:1;border:0;background:none;padding:10px 6px;border-radius:11px;cursor:pointer;font-weight:700;font-size:13px}
+.vmd button.on{background:linear-gradient(120deg,#6c47ff,#ec2f8c);color:#fff}
+.fst{border:1px dashed color-mix(in srgb,var(--brand) 50%,var(--line));border-radius:14px;padding:12px;background:color-mix(in srgb,var(--brand) 5%,var(--card));display:flex;flex-direction:column;gap:6px}
+.fst ol{margin:0;padding-inline-start:20px;line-height:2;font-size:13px}
+.fcr{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center;font-size:12px}
+.fcr div{border:1px solid var(--line);border-radius:12px;padding:8px 4px;background:var(--card)}.fcr b{display:block;font-size:15px}
+.fdl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px;border-radius:12px;background:color-mix(in srgb,#12a150 8%,var(--card));border:1px solid color-mix(in srgb,#12a150 35%,var(--line))}
+.fdl a[data-vplay] img,.fdl a[data-img] img{width:72px!important;height:48px!important;border-radius:8px!important}
+.pgrid{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:4px}
+.pgr{border:1px solid var(--line);border-radius:14px;padding:8px;background:var(--bg);display:flex;flex-direction:column;gap:6px}
+.pgr>b{font-size:12.5px}.pgr .pi{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start}
+.pgr .pi a img{width:64px!important;height:64px!important;border-radius:10px!important;object-fit:cover}
+.pgr .tg{font-size:10px;font-weight:800;border-radius:99px;padding:0 7px;background:#14122b;color:#fff;align-self:flex-start}
 </style>
 </head>
 <body>
@@ -656,7 +671,7 @@ const shrinkImg=(f,maxW=1280,maxH=2400,q=.85)=>new Promise(ok=>{
   img.onerror=()=>{URL.revokeObjectURL(url);ok(f)};img.src=url});
 async function uploadWithPoster(u,base,f,kind,ses,i){let ex;
   if(/^image\//.test(f.type||'')){UP.draw(0,'🗜️ '+esc(f.name),'در حال بهینه‌سازی تصویر…');const o=f.size;f=await shrinkImg(f);if(f.size<o)console.log('image',Math.round(o/1024)+'KB →',Math.round(f.size/1024)+'KB');}
-  if(/^video/.test(f.type)&&(kind==='media'||kind==='material')){try{const b=await framePoster(f);
+  if(/^video/.test(f.type)&&(kind==='media'||kind==='material'||kind==='idea')){try{const b=await framePoster(f);
     if(b){const pid=await uploadFile(u,base,new File([b],f.name+'.jpg',{type:'image/jpeg'}),'poster',ses,i);if(pid)ex={poster:pid};}}catch(e){}}
   return uploadFile(u,base,f,kind,ses,i,ex);}
 /* حرکت: نور و کج‌شدن سه‌بعدی، شمارندهٔ عددی */
@@ -804,7 +819,7 @@ function student(){
     return `<div class="sr opx" style="margin:0"><b>🎛️ سبک و جزئیات صحنه</b><small>برای تصاویر و پرامپت‌های ویدئو. «خودکار» یعنی هوش مصنوعی برای هر پلان بهترین را انتخاب کند. انتخاب‌ها برای دفعهٔ بعد هم یادت می‌ماند.</small>
       <label>🧸 کاراکتر یا سوژهٔ اصلی (برای دقت بیشتر)<input data-opt="ch" maxlength="200" value="${esc(o.ch)}" placeholder="مثلاً: خرس قهوه‌ای کوچک با شال قرمز (می‌توانی انگلیسی هم بنویسی: little brown bear)"></label>
       <div><small class="lb">🎨 سبک بصری</small><div class="stl">${OPTS.st.map(([v,t])=>`<button type="button" data-ost="${v}" class="${o.st===v?'on':''}">${t}</button>`).join('')}</div></div>
-      <label class="chk" style="flex-direction:row;font-size:13.5px;color:var(--ink)"><input type="checkbox" data-opt="lock" ${o.lock?'checked':''}> 🔒 یکپارچگی کاراکتر: اول یک «کاراکتر مرجع» ساخته می‌شود و همهٔ پلان‌ها از روی همان ساخته می‌شوند</label>
+      <label class="chk" style="flex-direction:row;font-size:13.5px;color:var(--ink)"><input type="checkbox" data-opt="lock" style="width:auto;flex:none" ${o.lock?'checked':''}> 🔒 یکپارچگی کاراکتر: اول یک «کاراکتر مرجع» ساخته می‌شود و همهٔ پلان‌ها از روی همان ساخته می‌شوند</label>
       <div class="ogrid">${sel('cm','🎥 حرکت دوربین',o)}${sel('lt','💡 نورپردازی',o)}${sel('at','🌫️ فضا و جو',o)}${sel('md','🎭 حس و حال',o)}${sel('ar','📐 قاب',o)}${sel('du','⏱️ مدت هر پلان',o)}</div></div>`}
   const refOf=s=>{let b=null;D.files.forEach(f=>{if(f.num===D.num&&f.s===s&&f.kind==='idea'&&/-ref\.(jpg|png)$/.test(f.name||'')&&(!b||f.t>b.t))b=f});return b};
   const charHtml=(bible,ref)=>bible?`<div class="sbj" style="align-items:flex-start;margin-top:6px">${ref?`<a href="${DR.view(ref.id)}" data-img="${esc(ref.id)}"><img src="${DR.th(ref.id,240)}" alt="" style="width:72px;height:72px;object-fit:cover;border-radius:12px;display:block"></a>`:''}<div><b>🧸 کاراکتر ثابت همهٔ پلان‌ها:</b><div style="direction:ltr;text-align:left;font-size:12px;color:var(--mute);line-height:1.6">${esc(bible)}</div></div></div>`:'';
@@ -817,6 +832,19 @@ function student(){
   const mmss=ms=>{const q=Math.max(0,Math.floor(ms/1000));return fa(Math.floor(q/60))+':'+(q%60<10?'۰':'')+fa(q%60)};
   const FREE0=[['https://klingai.com','Kling','کار می‌کند ولی صف طولانی؛ شروع کن و بعداً سر بزن'],['https://fal.ai/grok-imagine-free','Grok Imagine (fal)','۵ ویدئوی رایگان در روز؛ از روی تصویر پلان'],['https://www.meta.ai','Meta AI','رایگان با محدودیت؛ ورود با اینستاگرام یا فیسبوک'],['https://chat.qwen.ai','Qwen Chat','حدود یک ویدئوی رایگان در روز'],['https://lumalabs.ai/dream-machine','Luma','چند ویدئوی رایگان']];
   const FREE=()=>(D.vsites&&D.vsites.length?D.vsites:FREE0);
+  const FLOW_URL=()=>D.flowurl||'https://labs.google/fx/tools/flow';
+  const vmode=()=>cfg.get('vmode','free')==='flow'?'flow':'free';
+  const flowOk=()=>cfg.get('flowok','')==='1';
+  const planOut=(s,i)=>{let b=null;const re=new RegExp('^FLOW-s'+s+'-\\d+-'+(i+1)+'\\.');D.files.forEach(f=>{if(f.num===D.num&&f.s===s&&f.kind==='idea'&&re.test(f.name||'')&&(!b||f.t>b.t))b=f});return b};
+  function flowSec(){const ok=flowOk();
+    return `<div class="fst"><b>${ok?'✅ حساب Google Flow تو آماده است':'🔑 راه‌اندازی یک‌باره (فقط بار اول)'}</b>
+      ${ok?`<small class="lb">هر روز ۵۰ اعتبار رایگان داری که به روز بعد منتقل نمی‌شود. <button class="btn" data-flowreset="1" type="button" style="font-size:11px;padding:2px 8px">راهنمای راه‌اندازی</button></small>`:`<ol><li>Google Flow را باز کن: <button class="btn" data-flowopen="1" type="button" style="padding:3px 10px">↗ باز کردن Flow</button></li>
+        <li>با <b>جیمیل خودت</b> وارد شو. رمز و ایمیلت فقط در سایت Google وارد می‌شود و در این اپ ذخیره نمی‌شود.</li>
+        <li>اگر صفحهٔ ساخت پروژه را دیدی، برگرد و تیک زیر را بزن.</li></ol>
+        <label class="chk"><input type="checkbox" data-flowok="1" style="width:auto;flex:none"> حسابم در Flow آماده است</label>
+        <small class="lb">اگر Flow برایت باز نشد یا پیام «در دسترس نیست» دیدی، از «🌐 سایت‌های رایگان» استفاده کن.</small>`}
+      <div class="fcr"><div><b>Lite</b>۱۰ اعتبار<br>تا ۵ ویدئو در روز</div><div><b>Fast</b>۲۰ اعتبار<br>تا ۲ ویدئو در روز</div><div><b>Quality</b>۱۰۰ اعتبار<br>با رایگان نمی‌شود</div></div>
+      <small class="lb">💡 صرفه‌جویی: تصویرها را اول همین‌جا نهایی کن؛ بعد در Flow با <b>Frames to Video</b> (تصویر پلان) یا <b>Ingredients to Video</b> (کاراکتر مرجع، برای یکسان ماندن کاراکتر) و مدل <b>Lite</b> ویدئو بساز. نتیجه را دانلود کن و با «📥 تحویل نتیجه» کنار همان پلان بگذار.</small></div>`}
   const site=()=>{const f=FREE(),k=cfg.get('vsite','');return f.find(x=>x[0]===k)||f[0]};
   function vStat(i){const j=VJ[cs+'|'+i];if(!j)return '';if(j.err)return `<span style="color:var(--danger)">⚠️ ${esc(j.err)}</span>`;
     return `⏳ در حال ساخت ویدئو… ${mmss(Date.now()-j.t0)} <small class="lb">(معمولاً ۱ تا ۴ دقیقه؛ می‌توانی پنجره را ببندی)</small>`}
@@ -826,17 +854,21 @@ function student(){
       <button class="btn pri" id="vpb" type="button">✨ ${p.length?'ساخت دوبارهٔ':'ساخت'} پرامپت‌های ویدئو</button><div class="lb" id="vpst"></div>${subjHtml(((D.vprompts||[]).find(x=>x.s===cs)||{}).subj)}
       ${p.length?`<div class="vpr"><button class="btn" data-vall="1" type="button">📋 کپی همهٔ پلان‌ها</button><button class="btn" data-vshare="1" type="button">📤 فرستادن به تلگرام / پیام‌رسان</button></div><small class="lb">نکته: با «📤 فرستادن» پرامپت‌ها را مثلاً در Saved Messages تلگرام نگه دار تا در سایت ساخت ویدئو همیشه دمِ دستت باشند.</small>`+p.map((o,i)=>{const im=planImgOf(cs,i),vd=planVidOf(cs,i),run=VJ[cs+'|'+i]&&!VJ[cs+'|'+i].err;
         return `<div class="vpc"><div class="vph"><b>🎞️ پلان ${fa(i+1)}</b>${im?`<a href="${DR.view(im.id)}" data-img="${esc(im.id)}" title="تصویر پلان (برای Image to Video دانلود کن)"><img src="${DR.th(im.id,200)}" alt=""></a>`:''}</div>
-          <div class="vpt en">${esc(o.en)}</div><div class="vpr"><button class="btn pri" data-vgoto="${i}" type="button">🚀 کپی و رفتن به ${esc(site()[1])}</button><button class="btn" data-vcp="en|${i}" type="button">📋 کپی انگلیسی</button>${im?`<a class="btn" href="https://drive.google.com/uc?export=download&id=${esc(im.id)}" target="_blank" rel="noopener">⬇ تصویر پلان</a>`:''}</div>
+          <div class="vpt en">${esc(o.en)}</div><div class="vpr"><button class="btn pri" data-vgoto="${i}" type="button">🚀 کپی و ${vmode()==='flow'?'باز کردن Google Flow':'رفتن به '+esc(site()[1])}</button><button class="btn" data-vcp="en|${i}" type="button">📋 کپی انگلیسی</button>${im?`<a class="btn" href="https://drive.google.com/uc?export=download&id=${esc(im.id)}" target="_blank" rel="noopener">⬇ تصویر پلان</a>`:''}</div>
           ${o.fa?`<div class="vpt">${esc(o.fa)}</div><div class="vpr"><button class="btn" data-vcp="fa|${i}" type="button">📋 کپی فارسی</button></div>`:''}
+          ${vmode()==='flow'?(()=>{const rf=refOf(cs),out=planOut(cs,i);return `<div class="vpr">${rf?`<a class="btn" href="https://drive.google.com/uc?export=download&id=${esc(rf.id)}" target="_blank" rel="noopener">⬇ کاراکتر مرجع (Ingredients)</a>`:''}<label class="btn" style="background:linear-gradient(120deg,#12a150,#06a8c9);color:#fff;border:0">📥 ${out?'تحویل دوبارهٔ':'تحویل'} نتیجهٔ پلان ${fa(i+1)}<input type="file" id="ffl${i}" accept="video/*,image/*" hidden></label></div>
+            ${out?`<div class="fdl">${idLink(out)}<small>✅ نتیجهٔ Flow برای پلان ${fa(i+1)} تحویل شد</small></div>`:''}`})():''}
           ${D.vid?`<div class="vpr"><button class="btn pri" data-vgo="${i}" type="button" ${run?'disabled':''}>🎥 ${vd?'ساخت دوبارهٔ':'ساخت'} ویدئوی این پلان</button>${vd?vidLink(vd).replace('<img ','<img style="width:72px;height:48px" '):''}</div>`:''}
           <div class="vst" id="vst${i}">${vStat(i)}</div></div>`}).join(''):''}
     </div>
     <div class="sr" style="margin:0"><b>🎥 ساخت ویدئو با هوش مصنوعی</b>
+      <div class="vmd"><button type="button" data-vmode="free" class="${vmode()==='free'?'on':''}">🌐 سایت‌های رایگان</button><button type="button" data-vmode="flow" class="${vmode()==='flow'?'on':''}">🎬 Google Flow با حساب خودم</button></div>
+      ${vmode()==='flow'?flowSec()+'</div>':`
       ${D.vid?`<small>دکمهٔ «🎥 ساخت ویدئوی این پلان» را بزن؛ ویدئو خودکار ساخته و همین‌جا (و در Drive کلاس) ذخیره می‌شود. حداکثر ۴ ویدئو در هر جلسه.</small><small><b>یا</b> با کیفیت بالاتر در سایت‌های رایگان:</small>`:''}
       <small>۱) پرامپت <b>انگلیسی</b> پلان را کپی کن ۲) در یکی از این سایت‌ها بچسبان (اگر تصویر پلان را داری، روی آن بزن، ⬇ دانلود کن و در حالت <b>Image to Video</b> به‌عنوان فریم اول بده) ۳) ویدئو را دانلود کن و در «📁 تکلیف من» با «🎬 افزودن ویدئو» آپلود کن.</small>
       <small><b>سایت دلخواهت را انتخاب کن</b>؛ بعد دکمهٔ «🚀 کپی و رفتن» هر پلان، پرامپت را کپی و همان سایت را باز می‌کند. وقتی برگشتی، همین صفحه سر جایش است.</small>
       <div class="vsl">${FREE().map(([h,n,t])=>`<button type="button" data-vsite="${esc(h)}" class="${site()[0]===h?'on':''}">${esc(n)}<small>${esc(t)}</small></button>`).join('')}</div>
-      <div class="vpr"><button class="btn" data-vopen="1" type="button">↗ فقط باز کردن ${esc(site()[1])}</button></div></div>`}
+      <div class="vpr"><button class="btn" data-vopen="1" type="button">↗ فقط باز کردن ${esc(site()[1])}</button></div></div>`}`}
   const vRedraw=()=>{if($('vbox'))$('vbox').innerHTML=vBox();if($('idth'))$('idth').innerHTML=mine('idea',cs).map(f=>`<span class="btn" style="display:inline-flex;gap:8px">${idLink(f)}<b data-del="${f.id}" style="cursor:pointer;color:var(--danger)">×</b></span>`).join('')};
   async function vpGen(b){const tx=$('idt').value.trim(),sh=($('aip').value||'').split(/\n\s*\n/).map(x=>x.trim()).filter(x=>x.length>=8).slice(0,4);
     if(!sh.length&&tx.length<8)return toast('اول ایده یا پلان‌هایت را بنویس');
@@ -908,7 +940,10 @@ function student(){
     const os=t.closest('[data-ost]');if(os){setOpt('st',os.dataset.ost);os.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===os));return}
     if(t.id==='aib')return aiGen(t);if(t.id==='vpb')return vpGen(t);
     const vg=t.closest('[data-vgo]');if(vg)return vidStart(+vg.dataset.vgo,vg);
-    const vgt=t.closest('[data-vgoto]');if(vgt){const o=vpOf(cs)[+vgt.dataset.vgoto];if(!o)return;const sx=site();uiSave();
+    const vm=t.closest('[data-vmode]');if(vm){cfg.set('vmode',vm.dataset.vmode);vRedraw();return}
+    if(t.closest('[data-flowopen]')){uiSave();window.open(FLOW_URL(),'_blank','noopener');return}
+    if(t.closest('[data-flowreset]')){cfg.set('flowok','');vRedraw();return}
+    const vgt=t.closest('[data-vgoto]');if(vgt){const o=vpOf(cs)[+vgt.dataset.vgoto];if(!o)return;const sx=vmode()==='flow'?[FLOW_URL(),'Google Flow']:site();uiSave();
       try{navigator.clipboard.writeText(o.en)}catch(x){}window.open(sx[0],'_blank','noopener');toast('پرامپت پلان '+fa(+vgt.dataset.vgoto+1)+' کپی شد؛ در '+sx[1]+' Paste کن',4500);return}
     const vsb=t.closest('[data-vsite]');if(vsb){cfg.set('vsite',vsb.dataset.vsite);vRedraw();return}
     if(t.closest('[data-vopen]')){uiSave();window.open(site()[0],'_blank','noopener');return}
@@ -944,6 +979,11 @@ function student(){
   async function recSend(){if(!MB)return;const ext=/mp4/.test(MB.type)?'m4a':'webm',f=new File([MB],'voice-s'+cs+'.'+ext,{type:MB.type.split(';')[0]});MB=null;UP.begin(1);
     try{await uploadFile(u,{num:D.num},f,'idea',cs,0);UP.end(true,'صدای ایده ارسال شد 🎙️');burst(document.body);await refresh();ideaModal();}catch(err){UP.end(false,'ارسال ناموفق: '+err.message)}}
   async function change(e){
+    if(e.target.dataset&&e.target.dataset.flowok){cfg.set('flowok',e.target.checked?'1':'');if(e.target.checked)toast('عالی! حالا برای هر پلان «🚀 کپی و باز کردن Google Flow» را بزن');vRedraw();return}
+    const fm=/^ffl(\d)$/.exec(e.target.id||'');if(fm){const f=e.target.files[0];if(!f)return;const i=+fm[1],ext=(String(f.name).match(/\.(\w{2,5})$/)||[,/^video/.test(f.type)?'mp4':'jpg'])[1].toLowerCase();
+      if(!/^(video|image)\//.test(f.type||''))return toast('فقط ویدئو یا تصویر');UP.begin(1);
+      try{await uploadWithPoster(u,{num:D.num},new File([f],'FLOW-s'+cs+'-'+Date.now()+'-'+(i+1)+'.'+ext,{type:f.type}),'idea',cs,0);UP.end(true,'نتیجهٔ پلان '+fa(i+1)+' تحویل شد 🎬');burst(document.body);await refresh();vRedraw()}
+      catch(err){UP.end(false,'آپلود ناموفق: '+err.message)}return}
     const id=e.target.id,ok=e.target.dataset&&e.target.dataset.opt;if(ok){setOpt(ok,ok==='lock'?e.target.checked:e.target.value);return}
     if(id==='fav1'||id==='fav2'){const f=e.target.files[0];if(!f)return;UP.begin(1);
       try{let b;try{b=await squareJpeg(f)}catch(x){if(/^image\/(jpeg|png|webp)$/.test(f.type)&&f.size<8e6)b=f;else throw new Error('این فرمت عکس (مثلاً HEIC) خوانده نشد؛ در تنظیمات دوربین فرمت JPEG/«سازگارترین» را بگذار')}await uploadFile(u,{num:D.num},new File([b],'avatar.jpg',{type:b.type||'image/jpeg'}),'avatar',0,0);UP.end(true,'عکس پروفایل ذخیره شد ✨');burst(document.body);await refresh();$('pm').classList.remove('on');$('pb').innerHTML='';view();}
@@ -1007,6 +1047,10 @@ function renderList(){
       <div class="bar"><i style="width:${prog(s.id)/N*100}%"></i></div></div>`}).join('')||'<div class="empty">موردی یافت نشد</div>';
 }
 
+const planOf=f=>{const m=/^(AI|AIV|FLOW)-s\d+-\d+-(\d)\.\w+$/.exec(String(f.name||''));return m?{src:m[1],n:+m[2]}:null};
+function planGrid(fs){const P={};fs.forEach(f=>{const p=planOf(f);if(!p)return;const k=isVid(f)?(p.src==='FLOW'?'fv':'av'):(p.src==='FLOW'?'fi':'ai'),o=P[p.n]=P[p.n]||{};if(!o[k]||f.t>o[k].t)o[k]=f});
+  const ns=Object.keys(P).map(Number).sort((a,b)=>a-b);if(!ns.length)return '';
+  return `<div class="pgrid">${ns.map(n=>{const o=P[n];return `<div class="pgr"><b>🎞️ پلان ${fa(n)}</b><div class="pi">${[['ai','تصویر AI'],['fi','تصویر Flow'],['fv','ویدئو Flow'],['av','ویدئو AI']].filter(([k])=>o[k]).map(([k,l])=>`<span style="display:flex;flex-direction:column;gap:3px">${idLink(o[k])}<span class="tg">${l}</span></span>`).join('')}</div></div>`}).join('')}</div>`}
 function card(sid,s){
   const r=rec(sid,s),ms=mediaByKey[key(sid,s)]||[],me=ms.filter(f=>f.kind==='media'),idf=ms.filter(f=>f.kind==='idea'),idea=ideaByKey[key(sid,s)],x=score(sid,s),o=peer[key(sid,s)];
   return `<div class="card ${r.done?'done':''} ${s===FINAL?'final':''}" id="c${s}" data-s="${s}" style="--i:${s}">
@@ -1015,7 +1059,7 @@ function card(sid,s){
     ${me.length?stage(me):`<div class="stg emp"><span class="fl">📭</span><small>ویدئو/فریمی توسط دانشجو بارگذاری نشده</small></div>`}
     <div class="seg">${rateBtns(r.rating)}</div>
     <div class="lb">${r.rating?rateLbl(r.rating):'امتیاز استاد را انتخاب کنید'}${o?` · همکلاسی‌ها: <b>${fa(o.sum/o.n)}</b> از ۵ (${fa(o.n)} رأی)`:''}</div>
-    <div class="idea"><b>💡 ایده</b>${idea&&idea.text?`<p>${esc(idea.text)}</p>`:''}${idf.map(f=>`<span class="btn" style="display:inline-flex;gap:6px;align-items:center">${idLink(f)}</span>`).join(' ')}${(idea&&idea.text)||idf.length?'':'<small class="lb">ثبت نشده</small>'}</div>
+    <div class="idea"><b>💡 ایده</b>${idea&&idea.text?`<p>${esc(idea.text)}</p>`:''}${planGrid(idf)}${idf.filter(f=>!planOf(f)).map(f=>`<span class="btn" style="display:inline-flex;gap:6px;align-items:center">${idLink(f)}</span>`).join(' ')}${(idea&&idea.text)||idf.length?'':'<small class="lb">ثبت نشده</small>'}</div>
     <textarea class="note" placeholder="📝 یادداشت برای دانشجو (در صفحهٔ تکلیف او دیده می‌شود)" rows="2">${esc(r.note)}</textarea></div>`;
 }
 
